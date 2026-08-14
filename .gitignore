@@ -11,5 +11,8 @@ __pycache__/
 # Large corpus artifacts travel by rsync, not git (caption cache JSON IS committed)
 artifacts/*.parquet
 
+# Local clone cache of upstream corpora; reproduced by ingest/clone_docs.py
+.corpus_cache/
+
 # macOS
 .DS_Store

@@ -28,8 +28,8 @@ repo = "https://github.com/kubernetes/website"
 subtree = "content/en/docs/concepts"
 license = "CC-BY-4.0"
 attribution = "The Kubernetes Authors"
-start_sha = ""
-pinned_date = ""
+start_sha = "7c5466796d55309727f1bb13d834cd10053ca5bf"
+pinned_date = "2026-08-13"
 embed_model = "BAAI/bge-small-en-v1.5"
 embed_dim = 384
 
