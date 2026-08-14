@@ -1,0 +1,9 @@
+# Minimal config so the pinned prometheus container starts; scrape targets for the
+# API and DB land in the phase that exposes them.
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]

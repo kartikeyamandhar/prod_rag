@@ -1,0 +1,15 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Secrets: only .env.example is committed
+.env
+
+# Large corpus artifacts travel by rsync, not git (caption cache JSON IS committed)
+artifacts/*.parquet
+
+# macOS
+.DS_Store

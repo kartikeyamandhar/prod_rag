@@ -1,0 +1,44 @@
+# Corpus manifest: single source of truth for corpus provenance and evaluation splits.
+# Empty strings, empty arrays, and zero counts mean "not yet pinned"; they get pinned
+# at the named phase and never change afterwards without a logged decision.
+#
+# Schema
+# [docs_corpus]                      knowledge base (Corpus 1); replayed by the updater
+#   repo               string   upstream git repository URL
+#   subtree            string   sparse-checkout path that is indexed
+#   license            string   upstream content license
+#   attribution        string   attribution required by the license
+#   start_sha          string   pinned start commit SHA; pinned at Phase 1a ingest
+#   pinned_date        string   ISO date start_sha was pinned; Phase 1a
+#   embed_model        string   fastembed model name
+#   embed_dim          int      embedding dimensionality
+#
+# [ticket_corpus]                    tickets (Corpus 2); fixed snapshot, never replayed
+#   repo               string   upstream repository whose issues are pulled
+#   snapshot_date      string   ISO date of the REST snapshot; pinned at Phase 1b
+#   sigs               array    2 or 3 SIG labels; chosen and pinned at Phase 1b
+#   kind_filter        string   issue kind label filter
+#   resolution_linked  bool     only issues with a closing PR or accepted answer comment
+#   tenant_count       int      deterministic simulated tenants
+#   held_out_count     int      tickets reserved as replayed incoming; pinned at Phase 1b
+#   train_count        int      tickets loaded as resolved knowledge; pinned at Phase 1b
+
+[docs_corpus]
+repo = "https://github.com/kubernetes/website"
+subtree = "content/en/docs/concepts"
+license = "CC-BY-4.0"
+attribution = "The Kubernetes Authors"
+start_sha = ""
+pinned_date = ""
+embed_model = "BAAI/bge-small-en-v1.5"
+embed_dim = 384
+
+[ticket_corpus]
+repo = "https://github.com/kubernetes/kubernetes"
+snapshot_date = ""
+sigs = []
+kind_filter = "kind/bug"
+resolution_linked = true
+tenant_count = 50
+held_out_count = 0
+train_count = 0
