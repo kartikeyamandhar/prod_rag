@@ -10,6 +10,7 @@ __pycache__/
 
 # Large corpus artifacts travel by rsync, not git (caption cache JSON IS committed)
 artifacts/*.parquet
+artifacts/*.jsonl
 
 # Local clone cache of upstream corpora; reproduced by ingest/clone_docs.py
 .corpus_cache/
