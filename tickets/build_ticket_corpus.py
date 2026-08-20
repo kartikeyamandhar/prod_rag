@@ -78,9 +78,12 @@ def main(raw_path: Path) -> None:
             "has_images": [r["has_images"] for r in records],
             "snapshot_date": [snapshot_date] * len(records),
             "embed_text": [r["embed_text"] for r in records],
+            # Variable-size list, not fixed-size: parquet does not round-trip
+            # FixedSizeList with nulls (held-out tickets are NULL by design).
+            # The loader validates non-null lengths against embed_dim instead.
             "embedding": pa.array(
                 [train_vectors.get(r["number"]) for r in records],
-                type=pa.list_(pa.float32(), docs.embed_dim),
+                type=pa.list_(pa.float32()),
             ),
         }
     )

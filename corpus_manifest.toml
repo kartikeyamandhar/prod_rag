@@ -35,10 +35,10 @@ embed_dim = 384
 
 [ticket_corpus]
 repo = "https://github.com/kubernetes/kubernetes"
-snapshot_date = ""
-sigs = []
+snapshot_date = "2026-08-19"
+sigs = ["sig/network", "sig/scheduling", "sig/storage"]
 kind_filter = "kind/bug"
 resolution_linked = true
 tenant_count = 50
-held_out_count = 0
-train_count = 0
+held_out_count = 47
+train_count = 354

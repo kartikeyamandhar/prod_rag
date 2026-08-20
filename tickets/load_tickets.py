@@ -28,6 +28,13 @@ def main(parquet_path: Path) -> None:
         raise SystemExit("DATABASE_URL is not set; run via: uv run --env-file .env ...")
 
     table = pq.read_table(parquet_path)
+    bad = [
+        row["number"]
+        for row in table.to_pylist()
+        if row["embedding"] is not None and len(row["embedding"]) != 384
+    ]
+    if bad:
+        raise SystemExit(f"non-384 embeddings for tickets {bad[:5]} (total {len(bad)})")
     schema_sql = (REPO_ROOT / "tickets" / "schema.sql").read_text(encoding="utf-8")
 
     with psycopg.connect(database_url) as conn:

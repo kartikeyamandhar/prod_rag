@@ -1,9 +1,11 @@
 """Snapshot pull of kubernetes/kubernetes closed kind/bug issues for the chosen SIGs.
 
 Produces artifacts/tickets_raw_<date>.jsonl, one issue per line, enriched with the
-closing PR found on the issue timeline. The search filter `linked:pr` implements the
-closing-PR half of CLAUDE.md's resolution-linked definition; the accepted-answer half
-has no API-native marker and is deliberately out of scope (flagged in PHASES.md).
+closing PR via GraphQL closedByPullRequestsReferences (GitHub's own closing linkage;
+REST timeline cross-references are suppressed under fine-grained tokens, verified
+live). The search filter `linked:pr` implements the closing-PR half of CLAUDE.md's
+resolution-linked definition; the accepted-answer half has no API-native marker and
+is deliberately out of scope (flagged in PHASES.md).
 
 Run: uv run --env-file .env python -m tickets.pull_tickets
 """
@@ -51,29 +53,49 @@ def pull_sig_window(client: GitHubClient, sig: str, start: dt.date, end: dt.date
     )
 
 
-def closing_pr(timeline_events: list[dict]) -> tuple[int | None, str | None]:
-    """Best-effort closing PR from the issue timeline.
+GRAPHQL_BATCH = 50
 
-    Only UPSTREAM cross-references count: fork PRs (downstream backports like
-    openshift/kubernetes) cross-reference these issues constantly and would corrupt
-    the fix ground truth. Among upstream PR cross-references, the last closed one
-    wins; if none is closed, the last one seen.
+_CLOSED_BY_FRAGMENT = (
+    "i{n}: issue(number: {n}) {{ closedByPullRequestsReferences("
+    "first: 5, includeClosedPrs: true) {{ nodes {{ number url merged "
+    "repository {{ nameWithOwner }} }} }} }}"
+)
+
+
+def pick_closing_pr(nodes: list[dict]) -> tuple[int | None, str | None]:
+    """First merged upstream closing PR; falls back to the first upstream reference.
+
+    closedByPullRequestsReferences is GitHub's own closing linkage (the same signal
+    the linked:pr search qualifier uses), so no fork or heuristic filtering beyond
+    the upstream check is needed. Follow-up PRs can also appear; the first merged
+    one is taken as the primary fix.
     """
-    last_any: tuple[int | None, str | None] = (None, None)
-    last_closed: tuple[int | None, str | None] = (None, None)
-    for event in timeline_events:
-        if event.get("event") != "cross-referenced":
-            continue
-        source = event.get("source", {}).get("issue", {})
-        if "pull_request" not in source:
-            continue
-        if source.get("repository", {}).get("full_name") != REPO:
-            continue
-        ref = (source.get("number"), source.get("html_url"))
-        last_any = ref
-        if source.get("state") == "closed":
-            last_closed = ref
-    return last_closed if last_closed[0] is not None else last_any
+    upstream = [n for n in nodes if n.get("repository", {}).get("nameWithOwner") == REPO]
+    for node in upstream:
+        if node.get("merged"):
+            return node.get("number"), node.get("url")
+    if upstream:
+        return upstream[0].get("number"), upstream[0].get("url")
+    return None, None
+
+
+def closing_prs_batch(
+    client: GitHubClient, numbers: list[int]
+) -> dict[int, tuple[int | None, str | None]]:
+    """Resolve closing PRs for many issues via aliased GraphQL queries."""
+    results: dict[int, tuple[int | None, str | None]] = {}
+    for offset in range(0, len(numbers), GRAPHQL_BATCH):
+        batch = numbers[offset : offset + GRAPHQL_BATCH]
+        fields = " ".join(_CLOSED_BY_FRAGMENT.format(n=n) for n in batch)
+        query = f'query {{ repository(owner: "kubernetes", name: "kubernetes") {{ {fields} }} }}'
+        data = client.graphql(query)["repository"]
+        for n in batch:
+            nodes = (
+                (data.get(f"i{n}") or {}).get("closedByPullRequestsReferences", {}).get("nodes", [])
+            )
+            results[n] = pick_closing_pr(nodes)
+        logger.info("closing PRs resolved for %d/%d issues", len(results), len(numbers))
+    return results
 
 
 def _issue_record(item: dict, sig: str) -> dict:
@@ -115,10 +137,9 @@ def main() -> None:
         per_sig_raw[sig] = sig_count
 
     logger.info("deduplicated to %d unique issues", len(by_number))
+    resolved = closing_prs_batch(client, sorted(by_number))
     for number, record in by_number.items():
-        pr_number, pr_url = closing_pr(client.issue_timeline(REPO, number))
-        record["closing_pr_number"] = pr_number
-        record["closing_pr_url"] = pr_url
+        record["closing_pr_number"], record["closing_pr_url"] = resolved[number]
     client.close()
 
     ARTIFACTS.mkdir(exist_ok=True)

@@ -7,6 +7,7 @@ response the client sleeps to the advertised reset instead of hammering.
 
 from __future__ import annotations
 
+import json
 import logging
 import time
 
@@ -83,17 +84,24 @@ class GitHubClient:
                 return total, items
             page += 1
 
-    def issue_timeline(self, owner_repo: str, number: int) -> list[dict]:
-        events: list[dict] = []
-        page = 1
-        while True:
-            response = self._get(
-                f"/repos/{owner_repo}/issues/{number}/timeline",
-                {"per_page": 100, "page": page},
-                CORE_SLEEP_S,
+    def graphql(self, query: str, variables: dict[str, object] | None = None) -> dict:
+        """One GraphQL request. Used for closedByPullRequestsReferences, which REST
+        cannot provide under a fine-grained token (timeline cross-referenced events
+        are suppressed for authenticated fine-grained requests; verified live)."""
+        for attempt in range(MAX_ATTEMPTS):
+            response = self._client.post(
+                "/graphql", json={"query": query, "variables": variables or {}}
             )
-            batch = response.json()
-            events.extend(batch)
-            if len(batch) < 100 or page >= 10:
-                return events
-            page += 1
+            if response.status_code >= 500:
+                backoff = 2.0**attempt
+                logger.warning("graphql -> %d; backing off %.0fs", response.status_code, backoff)
+                time.sleep(backoff)
+                continue
+            if response.is_error:
+                raise GitHubError(f"graphql -> {response.status_code}: {response.text[:200]}")
+            payload = response.json()
+            if payload.get("errors"):
+                raise GitHubError(f"graphql errors: {json.dumps(payload['errors'])[:300]}")
+            time.sleep(CORE_SLEEP_S)
+            return payload["data"]
+        raise GitHubError(f"graphql: {MAX_ATTEMPTS} attempts exhausted")

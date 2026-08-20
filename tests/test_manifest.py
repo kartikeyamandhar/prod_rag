@@ -21,8 +21,12 @@ def test_repo_manifest_loads_and_matches_pins() -> None:
     # Docs corpus pinned at Phase 1a; the SHA never changes after this.
     assert re.fullmatch(r"[0-9a-f]{40}", manifest.docs_corpus.start_sha)
     assert date.fromisoformat(manifest.docs_corpus.pinned_date) == date(2026, 8, 13)
-    # Ticket corpus stays unpinned until Phase 1b; empty means unpinned, never fake.
-    assert manifest.ticket_corpus.snapshot_date == ""
+    # Ticket corpus pinned at Phase 1b; a fixed snapshot forever after.
+    assert date.fromisoformat(manifest.ticket_corpus.snapshot_date) == date(2026, 8, 19)
+    assert manifest.ticket_corpus.sigs == ["sig/network", "sig/scheduling", "sig/storage"]
+    assert manifest.ticket_corpus.held_out_count == 47
+    assert manifest.ticket_corpus.train_count == 354
+    assert manifest.ticket_corpus.held_out_count + manifest.ticket_corpus.train_count == 401
 
 
 def test_missing_manifest_raises_manifest_error(tmp_path: Path) -> None:
