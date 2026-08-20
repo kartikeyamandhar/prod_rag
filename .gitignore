@@ -15,5 +15,11 @@ artifacts/*.jsonl
 # Local clone cache of upstream corpora; reproduced by ingest/clone_docs.py
 .corpus_cache/
 
+# Terraform: state and live variables stay local; the lock file IS committed
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.*
+infra/terraform.tfvars
+
 # macOS
 .DS_Store
