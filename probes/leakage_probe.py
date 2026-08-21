@@ -28,7 +28,7 @@ def run(conn: psycopg.Connection, tickets: list, embedder, enabled: bool) -> dic
     with conn.cursor() as cur:
         cur.execute("SELECT number, tenant_id FROM tickets")
         tenant_of = dict(cur.fetchall())
-    for number, title, body, tenant_id in tickets:
+    for _number, title, _body, tenant_id in tickets:
         qvec = embed_query(embedder, title)
         items = hybrid_search(conn, qvec, title, tenant_id, tenant_filter_enabled=enabled)
         foreign = [
