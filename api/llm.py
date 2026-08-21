@@ -67,6 +67,12 @@ class BedrockLLM:
     def __init__(self, model_id: str | None = None, region: str | None = None) -> None:
         self.model_id = model_id or os.environ["BEDROCK_MODEL_ID"]
         self.meter = UsageMeter()
+        # Incident 1 v1 fix: admission control. Overflow degrades fast instead of
+        # queueing on Bedrock. Default 100 = effectively unlimited (the "before").
+        self._sem = threading.BoundedSemaphore(int(os.environ.get("LLM_MAX_CONCURRENCY", "100")))
+        self._acquire_timeout = float(os.environ.get("LLM_ACQUIRE_TIMEOUT_S", "0.25"))
+        # Incident 6 driver: scripted fault injection, labeled, never default.
+        self._fault_throttle = os.environ.get("FAULT_INJECT_THROTTLE", "0") == "1"
         self._client = boto3.client(
             "bedrock-runtime",
             region_name=region or os.environ.get("AWS_REGION", "us-west-2"),
@@ -80,6 +86,12 @@ class BedrockLLM:
     def converse(
         self, system: str, user: str, max_tokens: int = 1024, temperature: float = 0.0
     ) -> str:
+        if self._fault_throttle:
+            logger.warning("FAULT INJECTION: simulated throttle")
+            raise LLMUnavailable("FaultInjectedThrottle")
+        if not self._sem.acquire(timeout=self._acquire_timeout):
+            logger.warning("admission control saturated; degrading instead of queueing")
+            raise LLMUnavailable("AdmissionControlSaturated")
         try:
             response = self._client.converse(
                 modelId=self.model_id,
@@ -96,6 +108,8 @@ class BedrockLLM:
         except BotoCoreError as exc:
             logger.warning("bedrock connection failure", extra={"error": str(exc)})
             raise LLMUnavailable(str(exc)) from exc
+        finally:
+            self._sem.release()
 
         usage = response.get("usage", {})
         self.meter.add(usage)

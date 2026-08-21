@@ -8,6 +8,7 @@ top fused score normalized against the two-list-agreement ceiling.
 from __future__ import annotations
 
 import logging
+import os
 import re
 import time
 
@@ -117,6 +118,8 @@ def handle_ticket(
         try:
             triage = triage_llm(llm, ticket.title, ticket.body)  # type: ignore[arg-type]
         except (LLMUnavailable, ValueError) as exc:
+            if os.environ.get("DEGRADE_DISABLED", "0") == "1":
+                raise  # incident 6 "before": the naive system without a degrade path
             logger.warning("triage degraded to stub", extra={"reason": str(exc)})
             degraded = True
             triage = triage_ticket(ticket.title, ticket.body)
@@ -137,6 +140,8 @@ def handle_ticket(
         try:
             draft = draft_llm(llm, ticket.title, ticket.body, items)  # type: ignore[arg-type]
         except (LLMUnavailable, ValueError) as exc:
+            if os.environ.get("DEGRADE_DISABLED", "0") == "1":
+                raise
             logger.warning("draft degraded to extractive", extra={"reason": str(exc)})
             degraded = True
             draft = build_draft(items, ticket.title, ticket.body)
