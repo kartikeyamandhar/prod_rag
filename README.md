@@ -23,7 +23,7 @@ make test
 
 ## Status
 
-Phase 0 (scaffolding) executed; campaign plan and gates in [PHASES.md](PHASES.md).
+Full pipeline built and deployed: dual-corpus ingest, hybrid retrieval with tenant isolation, stub and Bedrock (Claude Haiku 4.5) triage/drafting behind the confidence gate, graceful degradation, KB commit replayer, k6 load scenarios, and Terraform for the single-instance AWS deploy. Next: the seven scripted production incidents, each measured before/after.
 
 ## Attribution
 

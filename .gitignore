@@ -26,3 +26,4 @@ infra/terraform.tfvars
 
 # Campaign log stays local, never committed
 PHASES.md
+CLAUDE.md
