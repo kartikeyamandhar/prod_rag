@@ -1,0 +1,115 @@
+{
+ "date": "2026-08-21",
+ "model_id": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+ "n_tickets": 5,
+ "results": [
+  {
+   "ticket": 139028,
+   "truth_sigs": [
+    "sig/scheduling"
+   ],
+   "llm_triage": "sig/scheduling",
+   "triage_hit": true,
+   "severity": "medium",
+   "route": "auto_attach",
+   "confidence": 0.725,
+   "degraded": false,
+   "n_citations": 1,
+   "judge": {
+    "grounding": 1,
+    "cause_plausibility": 1,
+    "actionability": 2,
+    "rationale": "The draft cites a generic affinity documentation snippet that is irrelevant to the actual bug (AssumePod snapshot field updates). The probable_cause explicitly disclaims understanding the issue rather than engaging with the ticket's concrete GitHub links and code references. The suggested_fix requests information already provided in the ticket (links to snapshot.go lines 50-57 and 339), demonstrating failure to ground in available evidence. Clarifying questions are reasonable but cannot compensate for the response's refusal to analyze the actual mechanism described in the ticket."
+   }
+  },
+  {
+   "ticket": 137797,
+   "truth_sigs": [
+    "sig/storage"
+   ],
+   "llm_triage": "sig/storage",
+   "triage_hit": true,
+   "severity": "high",
+   "route": "escalate",
+   "confidence": 0.74,
+   "degraded": true,
+   "n_citations": 5,
+   "judge": {
+    "grounding": 1,
+    "cause_plausibility": 1,
+    "actionability": 1,
+    "rationale": "The drafted response is fundamentally misaligned with the ticket. The probable_cause references an unrelated nfacct client initialization issue (ticket #126951) that has nothing to do with CSI Driver NFS path traversal validation. The suggested_fix discusses CSIMigration and in-tree plugin migration, which is irrelevant to a path traversal vulnerability in subDir parameter validation. The citations do not support any claims about the actual vulnerability (path traversal in subDir), and the clarifying questions are generic rather than addressing the specific security issue. This response would send the customer in an entirely wrong direction away from the actual problem."
+   }
+  },
+  {
+   "ticket": 135425,
+   "truth_sigs": [
+    "sig/network"
+   ],
+   "llm_triage": "sig/network",
+   "triage_hit": true,
+   "severity": "medium",
+   "route": "escalate",
+   "confidence": 0.71,
+   "degraded": true,
+   "n_citations": 5,
+   "judge": {
+    "grounding": 1,
+    "cause_plausibility": 1,
+    "actionability": 1,
+    "rationale": "The drafted response cites unrelated tickets (kube-apiserver service allocator panic, Mixed Version Proxy) that have no connection to the ticket's actual issue about RelaxedServiceNameValidation feature gate incomplete coverage of ingress defaultBackend. The probable_cause references issue #115316 which is about service allocation panics, not ingress validation. The suggested_fix about UnknownVersionInteroperabilityProxy feature gate is entirely inapplicable to the ingress service name validation problem described in the ticket. The citations are decorative and contradict the ticket's actual scope (networking/ingress validation, not service allocation or version proxying)."
+   }
+  },
+  {
+   "ticket": 133474,
+   "truth_sigs": [
+    "sig/network"
+   ],
+   "llm_triage": "sig/network",
+   "triage_hit": true,
+   "severity": "medium",
+   "route": "auto_attach",
+   "confidence": 0.675,
+   "degraded": false,
+   "n_citations": 1,
+   "judge": {
+    "grounding": 2,
+    "cause_plausibility": 1,
+    "actionability": 3,
+    "rationale": "The draft cites only one weak context item about terminating EndpointSlices, which is tangential to the ticket's core issue of churn when endpoint counts exceed 100. The probable_cause explicitly disclaims having relevant context, undermining grounding. The cause_plausibility is low because the draft avoids proposing a mechanism entirely, whereas PR #136502 likely addresses a specific bug in EndpointSlice splitting/rebalancing logic. Actionability is generic (logs, metrics, confirmation) with one relevant specific question about the 100-endpoint threshold, but lacks targeted diagnostics that would advance toward the actual resolution."
+   }
+  },
+  {
+   "ticket": 132719,
+   "truth_sigs": [
+    "sig/network"
+   ],
+   "llm_triage": "sig/network",
+   "triage_hit": true,
+   "severity": "medium",
+   "route": "auto_attach",
+   "confidence": 0.71,
+   "degraded": false,
+   "n_citations": 1,
+   "judge": {
+    "grounding": 2,
+    "cause_plausibility": 1,
+    "actionability": 2,
+    "rationale": "The draft cites only a generic statement about LoadBalancer service creation (docs:296) which is decorative and does not support any claim about the actual problem\u2014kube-proxy's inability to handle zero-masked CIDRs in ipset. The draft explicitly refuses to ground a probable_cause, which is a critical failure given that the ticket provides concrete evidence: the ipset error message and the root cause (ipset does not support zero-masked CIDRs). The suggested_fix asks clarifying questions rather than addressing the clear bug report, and the actionability is undermined by suggesting a workaround (use a different CIDR) that contradicts the ticket's legitimate use case and the actual resolution (which fixed kube-proxy to handle this scenario)."
+   }
+  }
+ ],
+ "pipeline_usage": {
+  "calls": 12,
+  "input_tokens": 15099,
+  "output_tokens": 2553,
+  "usd_at_list_rates": 0.0279
+ },
+ "judge_usage": {
+  "calls": 5,
+  "input_tokens": 7008,
+  "output_tokens": 926,
+  "usd_at_list_rates": 0.0116
+ },
+ "total_usd_at_list_rates": 0.0395
+}

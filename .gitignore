@@ -23,3 +23,6 @@ infra/terraform.tfvars
 
 # macOS
 .DS_Store
+
+# Campaign log stays local, never committed
+PHASES.md

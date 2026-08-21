@@ -102,11 +102,26 @@ def handle_ticket(
     model: TextEmbedding,
     ticket: TicketIn,
     tenant_filter_enabled: bool = True,
+    llm: object | None = None,
 ) -> FirstResponse:
+    # Deferred import: draft_llm imports this module's response models.
+    from api.draft_llm import draft_llm
+    from api.llm import LLMUnavailable
+    from triage.llm_triage import triage_llm
+
     timings: dict[str, float] = {}
+    degraded = False
 
     t0 = time.perf_counter()
-    triage = triage_ticket(ticket.title, ticket.body)
+    if llm is not None:
+        try:
+            triage = triage_llm(llm, ticket.title, ticket.body)  # type: ignore[arg-type]
+        except (LLMUnavailable, ValueError) as exc:
+            logger.warning("triage degraded to stub", extra={"reason": str(exc)})
+            degraded = True
+            triage = triage_ticket(ticket.title, ticket.body)
+    else:
+        triage = triage_ticket(ticket.title, ticket.body)
     timings["triage"] = round((time.perf_counter() - t0) * 1000, 2)
 
     t0 = time.perf_counter()
@@ -118,14 +133,32 @@ def handle_ticket(
     timings["retrieval"] = round((time.perf_counter() - t0) * 1000, 2)
 
     t0 = time.perf_counter()
-    draft = build_draft(items, ticket.title, ticket.body)
+    if llm is not None and not degraded:
+        try:
+            draft = draft_llm(llm, ticket.title, ticket.body, items)  # type: ignore[arg-type]
+        except (LLMUnavailable, ValueError) as exc:
+            logger.warning("draft degraded to extractive", extra={"reason": str(exc)})
+            degraded = True
+            draft = build_draft(items, ticket.title, ticket.body)
+    else:
+        draft = build_draft(items, ticket.title, ticket.body)
+
     retrieval_confidence = min(1.0, (items[0].score / RETRIEVAL_SCORE_CEILING) if items else 0.0)
-    route = decide_route(
-        triage_confidence=triage.confidence,
-        retrieval_confidence=round(retrieval_confidence, 3),
-        has_citations=bool(draft.citations),
-        body_chars=len(ticket.body),
-    )
+    if degraded:
+        # Incident 6 invariant: retrieval-only draft always routes to a human.
+        route = RouteDecision(
+            route="escalate",
+            confidence=round(0.5 * triage.confidence + 0.5 * retrieval_confidence, 3),
+            reasons=["degraded: Bedrock unavailable, retrieval-only draft, forced escalate"],
+        )
+        logger.warning("gate forced escalate: degraded mode")
+    else:
+        route = decide_route(
+            triage_confidence=triage.confidence,
+            retrieval_confidence=round(retrieval_confidence, 3),
+            has_citations=bool(draft.citations),
+            body_chars=len(ticket.body),
+        )
     timings["draft_and_gate"] = round((time.perf_counter() - t0) * 1000, 2)
 
     return FirstResponse(
@@ -142,5 +175,6 @@ def handle_ticket(
         ],
         draft=draft,
         route=route,
+        degraded=degraded,
         timings_ms=timings,
     )

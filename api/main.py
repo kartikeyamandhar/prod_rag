@@ -24,7 +24,14 @@ _state: dict = {}
 async def lifespan(app: FastAPI):
     _state["database_url"] = os.environ["DATABASE_URL"]
     _state["model"] = get_query_embedder(os.environ["EMBED_MODEL_NAME"])
-    logger.info("api ready")
+    if os.environ.get("BEDROCK_ENABLED", "0").lower() in ("1", "true", "yes"):
+        from api.llm import BedrockLLM
+
+        _state["llm"] = BedrockLLM()
+        logger.info("api ready, bedrock ENABLED", extra={"model_id": _state["llm"].model_id})
+    else:
+        _state["llm"] = None
+        logger.info("api ready, stub mode")
     yield
     _state.clear()
 
@@ -45,7 +52,7 @@ def tickets(ticket: TicketIn) -> FirstResponse:
         raise HTTPException(status_code=422, detail="title must be non-empty")
     try:
         with psycopg.connect(_state["database_url"], connect_timeout=5) as conn:
-            return handle_ticket(conn, _state["model"], ticket)
+            return handle_ticket(conn, _state["model"], ticket, llm=_state.get("llm"))
     except psycopg.OperationalError as exc:
         logger.error("database unavailable", extra={"error": str(exc)})
         raise HTTPException(status_code=503, detail="database unavailable") from exc
