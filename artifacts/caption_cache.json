@@ -1,0 +1,124 @@
+{
+ "https://user-images.githubusercontent.com/25921749/157999468-f79c307f-5d87-4a71-b031-0377e3aa3282.png": {
+  "caption": "A Pod scheduling failure is displayed in the Events section, showing a \"FailedScheduling\" warning from the default-scheduler indicating that 0/46 nodes are available due to insufficient free ports for the requested pod ports and 45 nodes not matching the requested hostname. The kubectl commands below show pod details for the admin namespace, with the pod currently in a Running state on node cvg57 with IP 193.168.0.81.",
+  "ticket": 108665
+ },
+ "https://user-images.githubusercontent.com/25921749/158000182-45641af3-8772-4034-8837-4cd7a0af4076.png": {
+  "caption": "The logs show repeated Pod scheduling failures in the \"admin\" namespace where the DefaultBinder plugin fails to bind pods due to \"Operation cannot be fulfilled on pods/binding\" errors, followed by etcdserver request timeouts. Event broadcasts indicate FailedScheduling warnings with insufficient available nodes and ports, showing 0/46 nodes matching the pod's resource requirements and port constraints.",
+  "ticket": 108665
+ },
+ "https://user-images.githubusercontent.com/25921749/158000527-6648af9c-87bf-48fb-a40d-94e7c27e1884.png": {
+  "caption": "This trace log shows a Kubernetes API server request to create a pod in the admin namespace via the REST endpoint `/api/v1/namespaces/admin/pods/`. The request was made by the kube-scheduler client (v1.19.4) from IP 193.160.0.13 on March 7, 2022, with a total latency of 11905ms, indicating a significant delay in pod creation processing.",
+  "ticket": 108665
+ },
+ "https://user-images.githubusercontent.com/3598874/170217712-644f770c-bed6-412d-94fb-b2c2369fd303.png": {
+  "caption": "The screenshot shows `kubectl get endpointslice` output comparing nginx-svc-v6mf6 endpoints before and after a cluster upgrade. The \"deleted endpoint before upgrade\" (highlighted in red) shows the old endpoint was removed, while the \"new created endpoint after upgrade\" (highlighted in yellow) displays three newly created endpoints with IP addresses 192.168.19.48, 192.168.19.49, and 192.168.19.50, all labeled as nodeNames.",
+  "ticket": 110208
+ },
+ "https://user-images.githubusercontent.com/44308864/192127331-ace9ed02-dc5d-41f1-8420-0a6bf06c20cf.png": {
+  "caption": "The Events table shows three pod scheduling and volume mounting issues: a Normal \"Scheduled\" event indicating successful assignment to node aks-agentpool-37112776-vms900003, a Warning \"FailedAttach\" event from the default-scheduler reporting unmounted volumes (test-cm2, test-ebs, and others) with a cross-attach-u66fpl timeout, and a Warning \"FailedMount\" event from kubelet indicating MountVolume.Setup failed because configmap \"noexist\" was not found for volume \"test-cm2\". These events span from 3m19s to 72s ago and indicate persistent volume attachment and configuration issues preventing pod startup",
+  "ticket": 112720
+ },
+ "https://user-images.githubusercontent.com/29896262/204746895-2d7dd34b-9838-4f9d-8cba-02685037fcde.gif": {
+  "caption": "The image shows concurrent log traces from a pod deletion scenario where the reconcile routine and operationExecutor unmount routine are racing. Key events include: UnmountDevice succeeding and deleting the vol_data.json file, followed by DeviceMountState transitioning from DeviceGloballyMounted to DeviceNotMounted, while the operationExecutor still attempts to unmount the device. The error message indicates a persistentvolumes resource conflict on node 192.168.3.181, with the globalMountPath containing a stale volumeHandle value (SU3550) that no longer matches the pvName in kds 1.25, causing the unmount operation to fail",
+  "ticket": 114207
+ },
+ "https://user-images.githubusercontent.com/10915774/207255935-e73d8930-fb85-4e14-82b6-cf28ff45191e.png": {
+  "caption": "The screenshot shows a `kubectl describe endpoints` output for the bingokube-console Service in the kube-system namespace, with the NotReadyAddresses field highlighted in red containing multiple replicas of IP 10.16.203.62, indicating that all endpoint pods are in a not-ready state. Below that, a `kubectl get pods` output displays the bingokube-console deployment with most pod replicas showing 0/1 Error status and only one pod (mbcqw) in Running 1/1 state, suggesting widespread pod startup or readiness probe failures across the deployment.",
+  "ticket": 114440
+ },
+ "https://user-images.githubusercontent.com/1299064/224100503-708cb729-6a4c-48fe-b634-66421dd8e180.png": {
+  "caption": "This screenshot shows a CPU profiling flame graph from a Kubernetes workqueue component, specifically the `workqueue.Parallelized.init` function consuming 117.45s (95% of total runtime). The call stack traces through `podTopologySpread` PreFilter and `countPodsMatchSelector` operations, with metrics displayed showing component-base/metrics GaugeVec WithLabelValues calls totaling 28.07s (22.8%), self time of 90ms, and line-level breakdowns mapping to the kube-scheduler binary.",
+  "ticket": 116427
+ },
+ "https://user-images.githubusercontent.com/2559168/225871722-503ba2e7-2611-4ec7-b05b-b2ef90b55699.png": {
+  "caption": "A flame graph showing CPU profiling data at 64.92s (100%) with runtime functions and Kubernetes-related components highlighted. The graph displays call stacks including `runtime.gcBgMarkWorker`, `runtime.systemstack`, storage metrics collectors (`BaseStableCollector`, `attachDetachStateCollector`), volume utilities (`CreateVolumeSpec`, `translateInTreeSpecToCSIIfNeeded`), and CSI migration components (`PluginManager.IsMigratable`, `CSITranslator.GetInTreePluginNameFromSpec`), with an arrow pointing to `fmt.Errorf` indicating a potential error handling hotspot in the profiling data",
+  "ticket": 116710
+ },
+ "https://user-images.githubusercontent.com/34534103/226664453-426379c0-1d1c-46cf-8d73-2ba369b91b01.png": {
+  "caption": "The screenshot shows a kubelet pod volume mount failure where an `ls` command cannot access the path `/var/lib/kubelet/pods/5257eef1-d3cb-4e91-82ec-3c7df5e82470/volumes/kubernetes.io-csi/drupal-code/mount` with \"No such file or directory\" error. The listing of the volumes directory shows several volume types mounted (kubernetes.io-configmap, kubernetes.io-csi, kubernetes.io-empty-dir, kubernetes.io-projected) but the expected CSI volume mount point is missing or inaccessible.",
+  "ticket": 116847
+ },
+ "https://user-images.githubusercontent.com/22770898/234300695-dbe4321f-e2d2-4436-bd0b-d2ab343b8617.png": {
+  "caption": "A CPU flame graph showing performance profiling data for the kube-scheduler component, with a tooltip displaying metrics from `kbs.io/component-base/metrics/counter.go`. The graph highlights the `metrics.(*CounterVec).WithLabelValues` function consuming 5.57s (10.6% of total 52.46s runtime), with breakdown showing 40ms self time and call distribution across 180 lines with 173 (0.038%) and 177 (0.019%) being significant contributors. The mapping indicates this is profiling the kube-scheduler's metric collection during label value operations.",
+  "ticket": 117592
+ },
+ "https://github.com/user-attachments/assets/d4b6f873-ab73-48dd-b544-feffcbcc68e3": {
+  "caption": "The kubelet_volumes.go log shows orphaned pod errors where pods with IDs like \"1902zq9f-7074-4caf-8ce8-8f48e412b28f\" are found but their volume paths remain present on disk, indicating incomplete cleanup. The error repeats multiple times with identical pod IDs and suggests enabling verbose logging to diagnose the volume cleanup failure.",
+  "ticket": 127229
+ },
+ "https://github.com/user-attachments/assets/8714624f-bd39-49f1-a467-a8e4ef947274": {
+  "caption": "System resource utilization showing a kube-proxy-bin process consuming 100% CPU and 16.9% memory (7.8g RES) on a node with 482 days uptime. The system has 1 sleeping task, high idle CPU at 91.4%, and approximately 4GB free memory out of 48GB total, indicating potential kube-proxy performance degradation or resource leak.",
+  "ticket": 128928
+ },
+ "https://github.com/user-attachments/assets/36998270-1af6-4583-b037-c0c55170a5e7": {
+  "caption": "This screenshot shows Prometheus metrics from kube-proxy tracking proxy rules synchronization activity. The metrics display cumulative counters for `endpoint_changes_total` (6.58M changes) and `service_changes_total` (6.86M changes), indicating the volume of Endpoint and Service resource modifications that kube-proxy has processed for updating its proxy rules.",
+  "ticket": 128928
+ },
+ "https://github.com/user-attachments/assets/c47becc3-013d-4d13-8302-ca43d344d0a7": {
+  "caption": "The screenshot shows a memory profiling analysis of the kube-proxy pod in the kube-system namespace, revealing significant heap allocation dominated by EndpointSlice-related operations (updatePending, checkoutChanges, newEndpointSliceTracker) consuming 113.83MB (56.20% of total). The go tool pprof heap profile indicates memory leaks in the proxy's endpoint slice caching mechanism, with additional allocations from growSlice, buffer operations, and protobuf unmarshaling contributing to the 202.55MB total heap usage across 67 nodes.",
+  "ticket": 128928
+ },
+ "https://github.com/user-attachments/assets/236aa4f0-2534-40af-8780-a40bd5f5a377": {
+  "caption": "The graph displays the `scheduler_schedule_attempts` metric over a 9-minute period, showing a sharp decline from approximately 450 attempts at 11:55:30 to near zero by 12:03:00. This metric tracks the number of scheduling attempts made by the Kubernetes scheduler, with the dramatic drop suggesting either a scheduler failure, cluster scaling event, or workload depletion that caused scheduling activity to cease.",
+  "ticket": 128949
+ },
+ "https://github.com/user-attachments/assets/00d57008-172c-4469-b39e-bc3e4983144a": {
+  "caption": "This is a CPU flame graph showing performance profiling data from a Kubernetes scheduler component, with the dominant call stack involving PodTopologySpread scoring and PreScore functions. The graph reveals heavy usage of regex operations, k8s.io/kubernetes vendor packages, and scheduler framework plugins, particularly the PodMatchesNodeSelector and PodTopologySpread helpers. The wide base indicates significant time spent in workqueue.ParallelizeUntil and runtime operations, suggesting potential performance bottlenecks in the scheduler's pod placement evaluation logic.",
+  "ticket": 128949
+ },
+ "https://github.com/user-attachments/assets/3eaf43d5-6bc8-47d5-8603-dab22dc65689": {
+  "caption": "The `scheduler_schedule_attempts_total` metric shows a sharp decline in successfully scheduled Pods (green line) from ~530 attempts at 10:48:30 to near zero by 10:53:30, while unschedulable Pods (yellow line) spike dramatically during the same period. This indicates a scheduler failure event where the default-scheduler transitioned from successfully placing Pods to being unable to schedule workloads, suggesting a potential resource exhaustion, node failure, or scheduler bug affecting Pod placement decisions.",
+  "ticket": 128949
+ },
+ "https://github.com/user-attachments/assets/d84160a2-2b10-4a0a-9078-faad3a010076": {
+  "caption": "Go source code from the `addrTable` function showing netlink message processing for RTM_NEWADDR (add address) syscall operations. The highlighted `return nil, err` statement indicates an early error return when `interfaceByIndex()` fails to find a matching interface, which could cause address addition failures in the network stack during pod networking setup.",
+  "ticket": 129146
+ },
+ "https://github.com/user-attachments/assets/f75f0bc0-e394-45fa-b323-2f6fc0570386": {
+  "caption": "This screenshot shows a list of kube-proxy pods in the kube-system namespace, all in Running status with 1/1 ready replicas and 0 restarts. The pods display varying CPU and memory usage metrics, with most showing \"n/a\" for resource limit percentages (%CPU/L, %MEM/L), indicating that resource limits may not be defined or properly reported for these proxy instances.",
+  "ticket": 129982
+ },
+ "https://github.com/user-attachments/assets/a4ff03e2-156c-4b60-bf87-7caf53859e51": {
+  "caption": "Prometheus metrics query interface showing `container_memory_usage_bytes` metric filtered for the `kube-proxy` container in a Production us-east-1 cluster, with a time-series graph displaying memory usage in bytes over a 6-day period from 01/29 to 02/04. The graph reveals significant memory spikes reaching approximately 1.32 GB on 02/03, with multiple colored lines representing different container instances or series.",
+  "ticket": 129982
+ },
+ "https://github.com/user-attachments/assets/81b4bea7-5cf6-498e-9cd4-ec807f267912": {
+  "error": "LLMUnavailable"
+ },
+ "https://github.com/user-attachments/assets/2f91e40f-76b4-401b-a352-75d0ecc53d66": {
+  "caption": "The kube-proxy Pod logs show repeated failures when attempting to add IP set entries for the KUBE-LOAD-BALANCER-SOURCE-CIDR ipset with the entry \"119.27.176.87,tcp:80,0.0.0.0/0\". The error indicates \"The value of the CIDR parameter of the IP address is invalid\" with exit status 1 from the ipset v7.15 command, suggesting a malformed CIDR notation in the load balancer source IP configuration.",
+  "ticket": 132719
+ },
+ "https://github.com/user-attachments/assets/19695634-7243-469e-8ad8-6920d126c946": {
+  "caption": "Memory usage graph for the kube-scheduler component showing heap allocation metrics (go_memstats_heap_alloc_bytes) across instance 135.231.3.108:10251. The graph demonstrates a significant memory spike peaking at ~160MB during pod deployment, followed by a sharp drop when pods are uninstalled, with memory stabilizing around 80-100MB afterward, indicating potential memory leak or inefficient garbage collection during pod lifecycle operations.",
+  "ticket": 133365
+ },
+ "https://github.com/user-attachments/assets/35b8b8c6-9fe8-4bca-826b-5ebef82a0993": {
+  "error": "LLMUnavailable"
+ },
+ "https://github.com/user-attachments/assets/4b5ca3c9-326d-4af6-b44d-dff583a68ce1": {
+  "caption": "This pprof CPU profile shows hot spots in the Kubernetes API server's v1 Pod unmarshalling code path, with `Unmarshal:55470` consuming significant CPU (36.61MB, 41%) during protobuf deserialization. The flame graph reveals nested calls through `StreamWatcher.receive`, `Decoder.Decode`, and `protobuf.unmarshalToObject`, indicating performance bottlenecks in Pod resource decoding during watch operations.",
+  "ticket": 133365
+ },
+ "https://github.com/user-attachments/assets/c076734f-97bc-46e7-b47b-9df51cd851bd": {
+  "caption": "This code snippet shows the `ClearEntriesForIP` function that attempts to delete UDP connection tracking state entries for a given IP address using `conntrack` commands. The function executes conntrack with parameters including the IP, protocol, and origin-destination flags, but includes a TODO comment noting that deletion failures may leave stale UDP connections that create black hole traffic\u2014a known issue where the function performs best-effort cleanup rather than guaranteed flushing of connection state.",
+  "ticket": 135323
+ },
+ "https://github.com/user-attachments/assets/a0d69435-ca59-4d0e-9cac-c63878bdb5ec": {
+  "caption": "Go code snippet showing netfilter conntrack flow deletion logic that iterates over raw data and filters, matching flows with `MatchConntrackFlow()` and executing `IPICTNL_MSG_CT_DELETE` netlink commands via `unix.NETLINK_NETFILTER`. The code handles execution errors and tracks matched flows and filter errors with counters.",
+  "ticket": 135323
+ },
+ "https://github.com/user-attachments/assets/de92a8d1-0d11-4f8c-8913-e94da6dbedd4": {
+  "caption": "The dashboard shows a \"Number of nodes\" metric (top, yellow line) with Ready status fluctuating between 0-6000 nodes over a 4-day period (02/20-02/23), exhibiting sharp spikes and drops that correlate with cluster scaling events. The \"Top 10 container CPU\" chart (bottom) displays CPU usage percentages for multiple containers, with the green line reaching peaks above 1200% and other containers showing sustained usage between 200-400%, indicating potential resource contention or uneven workload distribution across the cluster during the same timeframe.",
+  "ticket": 137218
+ },
+ "https://github.com/user-attachments/assets/97247e2e-ca1c-4328-aa6a-3d0222e86008": {
+  "caption": "This is a flame graph showing CPU profiling data from a Kubernetes component, with the root call stack dominated by `selinuxwarning` and `CollectWithStability.func1` operations. The graph reveals heavy activity in cache operations (`volumeCache.SendConflicts`), string processing (`strings.Split`, `strings.genSplit`), and memory allocation (`runtime.makeslice`, `runtime.mallocgc`), with notable time spent in `writeHeapBitsSmall` and heap management functions. The right side lists runtime functions including `gcBgMarkWorker`, `memeqbody`, and garbage collection operations, indicating potential performance bottlenecks in",
+  "ticket": 137218
+ },
+ "https://github.com/user-attachments/assets/6c6f8f91-8018-465e-af27-2d24cb6b386f": {
+  "caption": "The graphs show kube-proxy nftables sync time scaling with cluster size, comparing incremental sync (fullSync=false, left) versus full sync (fullSync=true, right) modes. The left panel displays total sync time reaching over 1 minute at 50,000 services with incremental syncs, while the right panel shows full syncs reaching approximately 17 minutes at the same scale, with ListAll operations (dashed line) remaining relatively flat compared to total time (solid line), indicating the bottleneck lies in nftables rule application rather than API list operations.",
+  "ticket": 139513
+ }
+}

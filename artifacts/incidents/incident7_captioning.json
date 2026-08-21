@@ -1,0 +1,25 @@
+{
+ "incident": 7,
+ "diagram_tickets": 32,
+ "corpus_rows_recaptioned": 16,
+ "caption_usage": {
+  "calls": 29,
+  "input_tokens": 25392,
+  "output_tokens": 3285,
+  "usd_at_list_rates": 0.0418
+ },
+ "before_image_blind": {
+  "n": 32,
+  "same_sig_ticket_in_top8": 28,
+  "same_sig_rate": 0.875,
+  "docs_domain_in_top8": 23,
+  "docs_domain_rate": 0.719
+ },
+ "after_captioning": {
+  "n": 32,
+  "same_sig_ticket_in_top8": 27,
+  "same_sig_rate": 0.844,
+  "docs_domain_in_top8": 22,
+  "docs_domain_rate": 0.688
+ }
+}

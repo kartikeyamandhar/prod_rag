@@ -84,19 +84,30 @@ class BedrockLLM:
         )
 
     def converse(
-        self, system: str, user: str, max_tokens: int = 1024, temperature: float = 0.0
+        self,
+        system: str,
+        user: str,
+        max_tokens: int = 1024,
+        temperature: float = 0.0,
+        images: list[dict] | None = None,
     ) -> str:
+        """One Converse call. `images`: [{"format": "png", "bytes": b"..."}] for vision."""
         if self._fault_throttle:
             logger.warning("FAULT INJECTION: simulated throttle")
             raise LLMUnavailable("FaultInjectedThrottle")
         if not self._sem.acquire(timeout=self._acquire_timeout):
             logger.warning("admission control saturated; degrading instead of queueing")
             raise LLMUnavailable("AdmissionControlSaturated")
+        content: list[dict] = [
+            {"image": {"format": img["format"], "source": {"bytes": img["bytes"]}}}
+            for img in (images or [])
+        ]
+        content.append({"text": user})
         try:
             response = self._client.converse(
                 modelId=self.model_id,
                 system=[{"text": system}],
-                messages=[{"role": "user", "content": [{"text": user}]}],
+                messages=[{"role": "user", "content": content}],
                 inferenceConfig={"maxTokens": max_tokens, "temperature": temperature},
             )
         except ClientError as exc:

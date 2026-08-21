@@ -183,19 +183,37 @@ xychart-beta
 
 ---
 
-## The seven incidents (the actual product of this repo)
+## The seven incidents, measured
 
-Each incident ships one v1 fix, measured before and after against a naive baseline (no triage, docs-only retrieval, no gate, always attach) that is kept as a runnable mode.
+Each incident ran on the deployed system with one v1 fix, before and after. Scripted injections (the incident 3 deletion, the incident 6 throttle) are labeled scripted in the ledger and configuration; everything else is real load, real upstream commits, or the corpus's own properties. Raw data: [artifacts/incidents/](artifacts/incidents/).
 
-| # | Incident | Mechanism | Status |
+| # | Incident | Before (failure) | After (v1 fix) |
 |---|---|---|---|
-| 1 | Ticket storm: 10 tickets in the same second | k6 scenario ready, storm baseline archived | mechanism ready, incident pending |
-| 2 | Stale KB after a real upstream edit gives deprecated advice | replayer + 13 real pending commits | mechanism ready, incident pending |
-| 3 | Deleted/renamed page orphan gives removed-API advice | delete/rename ledger | mechanism ready, incident pending |
-| 4 | Reindex during a storm (write contention) | replayer tick under k6 load | mechanism ready, incident pending |
-| 5 | Tenant leakage via seeded retrieval-filter bug | filter with observable off-switch (proof above) | mechanism verified, incident pending |
-| 6 | Bedrock throttle: graceful degrade | typed failure + forced escalate (test above) | **mechanism verified by test** |
-| 7 | Image-blind baseline on diagram-dependent tickets | 17 image-bearing pages, 32 diagram-dependent tickets inventoried | captioning pending |
+| 1 | Ticket storm, LLM in request path | median **21.1s**, p95 30s, only 6 of 11 requests finished in 30s | admission control (cap 3, overflow degrades): median **365ms**, all 11 finish, 0 failures |
+| 2 | Stale KB after real upstream edits | **8 of 8** changed-page queries served stale content | replay the real commits: **0 of 8** |
+| 3 | Orphaned page (scripted deletion) | deleted ingress page still cited in top 5 | replayer delete, 27 chunks removed, ledger row; retrieval falls to live pages |
+| 4 | Reindex under load | naive one-transaction reload: p95 **4,780ms**, 0.6% hard failures | incremental replay tick: p95 **150ms**, 0 failures |
+| 5 | Tenant leakage (seeded filter bug) | **47 of 47** queries leak; 184 of 188 ticket results foreign | **0 of 47** with the filter restored |
+| 6 | Provider throttle (scripted injection) | no degrade path: **15 of 15 requests fail** with 5xx | 15 of 15 return cited retrieval-only drafts, all force-escalated, median 285ms |
+| 7 | Image-blind baseline vs captioning | text-only: same-SIG 87.5%, docs-domain 71.9% (n=32) | captioning (29 images, $0.04): **no improvement** (84.4% / 68.8%), an honest null result: near-ceiling metric, and long captions dilute short-title queries |
+
+```mermaid
+xychart-beta
+    title "Incident 1: storm latency, before vs after admission control (ms)"
+    x-axis ["median before", "p95 before", "median after", "p95 after"]
+    y-axis "ms (log-ish scale, real values)" 0 --> 31000
+    bar [21056, 30085, 365, 13291]
+```
+
+```mermaid
+xychart-beta
+    title "Incident 4: p95 under sustained load during a reindex (ms)"
+    x-axis ["naive full reload", "incremental tick"]
+    y-axis "p95 ms" 0 --> 5000
+    bar [4780, 150]
+```
+
+The incident 7 null result is kept deliberately: the series is about measurement discipline, and "the obvious fix did not move the metric" is a finding, not a failure of the writeup.
 
 ---
 
