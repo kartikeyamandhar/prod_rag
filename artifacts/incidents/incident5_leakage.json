@@ -1,0 +1,20 @@
+{
+ "incident": 5,
+ "n_held_out": 47,
+ "before_seeded_bug": {
+  "tenant_filter_enabled": false,
+  "queries": 47,
+  "queries_with_foreign_results": 47,
+  "leak_incidence": 1.0,
+  "foreign_results_total": 184,
+  "ticket_results_total": 188
+ },
+ "after_fix": {
+  "tenant_filter_enabled": true,
+  "queries": 47,
+  "queries_with_foreign_results": 0,
+  "leak_incidence": 0.0,
+  "foreign_results_total": 0,
+  "ticket_results_total": 180
+ }
+}

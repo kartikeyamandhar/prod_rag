@@ -1,0 +1,125 @@
+{
+ "tag": "incident6_after",
+ "api": "http://34.221.233.34:8080",
+ "n": 15,
+ "http_200": 15,
+ "http_5xx_or_error": 0,
+ "degraded": 15,
+ "routes": {
+  "auto_attach": 0,
+  "escalate": 15,
+  "request_info": 0
+ },
+ "latency_ms": {
+  "median": 285,
+  "p95": 307,
+  "max": 420
+ },
+ "rows": [
+  {
+   "ticket": 139028,
+   "status": 200,
+   "degraded": true,
+   "route": "escalate",
+   "ms": 420
+  },
+  {
+   "ticket": 137797,
+   "status": 200,
+   "degraded": true,
+   "route": "escalate",
+   "ms": 288
+  },
+  {
+   "ticket": 135425,
+   "status": 200,
+   "degraded": true,
+   "route": "escalate",
+   "ms": 285
+  },
+  {
+   "ticket": 133474,
+   "status": 200,
+   "degraded": true,
+   "route": "escalate",
+   "ms": 180
+  },
+  {
+   "ticket": 132719,
+   "status": 200,
+   "degraded": true,
+   "route": "escalate",
+   "ms": 289
+  },
+  {
+   "ticket": 131661,
+   "status": 200,
+   "degraded": true,
+   "route": "escalate",
+   "ms": 229
+  },
+  {
+   "ticket": 131381,
+   "status": 200,
+   "degraded": true,
+   "route": "escalate",
+   "ms": 186
+  },
+  {
+   "ticket": 131045,
+   "status": 200,
+   "degraded": true,
+   "route": "escalate",
+   "ms": 191
+  },
+  {
+   "ticket": 129982,
+   "status": 200,
+   "degraded": true,
+   "route": "escalate",
+   "ms": 297
+  },
+  {
+   "ticket": 129825,
+   "status": 200,
+   "degraded": true,
+   "route": "escalate",
+   "ms": 255
+  },
+  {
+   "ticket": 126922,
+   "status": 200,
+   "degraded": true,
+   "route": "escalate",
+   "ms": 172
+  },
+  {
+   "ticket": 126885,
+   "status": 200,
+   "degraded": true,
+   "route": "escalate",
+   "ms": 289
+  },
+  {
+   "ticket": 126552,
+   "status": 200,
+   "degraded": true,
+   "route": "escalate",
+   "ms": 307
+  },
+  {
+   "ticket": 126468,
+   "status": 200,
+   "degraded": true,
+   "route": "escalate",
+   "ms": 306
+  },
+  {
+   "ticket": 125467,
+   "status": 200,
+   "degraded": true,
+   "route": "escalate",
+   "ms": 167
+  }
+ ]
+}

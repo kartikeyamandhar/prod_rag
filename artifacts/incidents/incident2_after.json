@@ -1,0 +1,50 @@
+{
+ "incident": 2,
+ "tag": "after",
+ "changed_pages_probed": 8,
+ "stale_pages_in_db": 3,
+ "queries_serving_stale_content": 3,
+ "stale_serving_incidence": 0.375,
+ "rows": [
+  {
+   "query": "Secrets",
+   "page": "content/en/docs/concepts/configuration/secret.md",
+   "stale_chunks_in_top5": 4
+  },
+  {
+   "query": "Custom Resources",
+   "page": "content/en/docs/concepts/extend-kubernetes/api-extension/custom-resources.md",
+   "stale_chunks_in_top5": 5
+  },
+  {
+   "query": "Pod Priority and Preemption",
+   "page": "content/en/docs/concepts/scheduling-eviction/pod-priority-preemption.md",
+   "stale_chunks_in_top5": 0
+  },
+  {
+   "query": "Topology-Aware Workload Scheduling",
+   "page": "content/en/docs/concepts/scheduling-eviction/topology-aware-scheduling.md",
+   "stale_chunks_in_top5": 0
+  },
+  {
+   "query": "Gateway API",
+   "page": "content/en/docs/concepts/services-networking/gateway.md",
+   "stale_chunks_in_top5": 0
+  },
+  {
+   "query": "Storage Classes",
+   "page": "content/en/docs/concepts/storage/storage-classes.md",
+   "stale_chunks_in_top5": 3
+  },
+  {
+   "query": "Volumes",
+   "page": "content/en/docs/concepts/storage/volumes.md",
+   "stale_chunks_in_top5": 0
+  },
+  {
+   "query": "Pods",
+   "page": "content/en/docs/concepts/workloads/pods/_index.md",
+   "stale_chunks_in_top5": 0
+  }
+ ]
+}

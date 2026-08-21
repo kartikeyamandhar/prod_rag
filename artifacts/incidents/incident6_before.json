@@ -1,0 +1,100 @@
+{
+ "tag": "incident6_before",
+ "api": "http://34.221.233.34:8080",
+ "n": 15,
+ "http_200": 0,
+ "http_5xx_or_error": 15,
+ "degraded": 0,
+ "routes": {
+  "auto_attach": 0,
+  "escalate": 0,
+  "request_info": 0
+ },
+ "latency_ms": {
+  "median": 85,
+  "p95": 96,
+  "max": 190
+ },
+ "rows": [
+  {
+   "ticket": 139028,
+   "status": 500,
+   "ms": 190
+  },
+  {
+   "ticket": 137797,
+   "status": "transport-error",
+   "error": "RemoteProtocolError",
+   "ms": 3
+  },
+  {
+   "ticket": 135425,
+   "status": 500,
+   "ms": 90
+  },
+  {
+   "ticket": 133474,
+   "status": "transport-error",
+   "error": "RemoteProtocolError",
+   "ms": 29
+  },
+  {
+   "ticket": 132719,
+   "status": 500,
+   "ms": 94
+  },
+  {
+   "ticket": 131661,
+   "status": 500,
+   "ms": 84
+  },
+  {
+   "ticket": 131381,
+   "status": "transport-error",
+   "error": "RemoteProtocolError",
+   "ms": 2
+  },
+  {
+   "ticket": 131045,
+   "status": 500,
+   "ms": 96
+  },
+  {
+   "ticket": 129982,
+   "status": 500,
+   "ms": 85
+  },
+  {
+   "ticket": 129825,
+   "status": "transport-error",
+   "error": "RemoteProtocolError",
+   "ms": 2
+  },
+  {
+   "ticket": 126922,
+   "status": 500,
+   "ms": 85
+  },
+  {
+   "ticket": 126885,
+   "status": 500,
+   "ms": 96
+  },
+  {
+   "ticket": 126552,
+   "status": "transport-error",
+   "error": "RemoteProtocolError",
+   "ms": 4
+  },
+  {
+   "ticket": 126468,
+   "status": 500,
+   "ms": 89
+  },
+  {
+   "ticket": 125467,
+   "status": 500,
+   "ms": 92
+  }
+ ]
+}
