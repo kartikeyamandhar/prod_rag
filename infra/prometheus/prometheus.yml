@@ -1,5 +1,6 @@
-# Minimal config so the pinned prometheus container starts; scrape targets for the
-# API and DB land in the phase that exposes them.
+# Scrapes itself plus the API on the host (uvicorn runs outside compose).
+# host.docker.internal resolves via the extra_hosts host-gateway mapping in
+# docker-compose.yml, on Linux boxes and Docker Desktop alike.
 global:
   scrape_interval: 15s
 
@@ -7,3 +8,8 @@ scrape_configs:
   - job_name: prometheus
     static_configs:
       - targets: ["localhost:9090"]
+
+  - job_name: rag-api
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["host.docker.internal:8080"]

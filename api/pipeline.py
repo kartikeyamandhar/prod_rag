@@ -125,6 +125,7 @@ def handle_ticket(
     # Deferred import: draft_llm imports this module's response models.
     from api.draft_llm import draft_llm
     from api.llm import LLMPermanentError, LLMUnavailable
+    from api.metrics import observe_degrade, observe_ticket
     from triage.llm_triage import triage_llm
 
     timings: dict[str, float] = {}
@@ -142,6 +143,7 @@ def handle_ticket(
                 raise  # incident 6 "before": the naive system without a degrade path
             reason = f"triage: {type(exc).__name__}: {exc}"
             degrade_reasons.append(reason)
+            observe_degrade("triage", exc)
             level = logging.ERROR if isinstance(exc, LLMPermanentError) else logging.WARNING
             logger.log(level, "triage degraded to stub", extra={"reason": reason})
             triage_degraded = True
@@ -167,6 +169,7 @@ def handle_ticket(
                 raise
             reason = f"draft: {type(exc).__name__}: {exc}"
             degrade_reasons.append(reason)
+            observe_degrade("draft", exc)
             level = logging.ERROR if isinstance(exc, LLMPermanentError) else logging.WARNING
             logger.log(level, "draft degraded to extractive", extra={"reason": reason})
             draft_degraded = True
@@ -188,6 +191,7 @@ def handle_ticket(
         context_sufficiency=draft.context_sufficiency,
     )
     timings["draft_and_gate"] = round((time.perf_counter() - t0) * 1000, 2)
+    observe_ticket(route.route, degraded, timings)
 
     return FirstResponse(
         triage=triage,

@@ -124,6 +124,9 @@ class BedrockLLM:
             logger.warning("FAULT INJECTION: simulated throttle")
             raise LLMUnavailable("FaultInjectedThrottle")
         if not self._sem.acquire(timeout=self._acquire_timeout):
+            from api.metrics import ADMISSION_REJECTS_TOTAL
+
+            ADMISSION_REJECTS_TOTAL.inc()
             logger.warning("admission control saturated; degrading instead of queueing")
             raise LLMUnavailable("AdmissionControlSaturated")
         try:
@@ -146,6 +149,9 @@ class BedrockLLM:
 
         usage = response.get("usage", {})
         self.meter.add(usage)
+        from api.metrics import observe_tokens
+
+        observe_tokens(usage)
         text = "".join(block.get("text", "") for block in response["output"]["message"]["content"])
         logger.info(
             "converse ok",
