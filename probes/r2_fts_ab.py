@@ -37,7 +37,7 @@ def measure(conn, embedder, tickets, ticket_sigs, fts_mode: str) -> dict:
     total_items = 0
     mrr_values: list[float] = []
     latencies: list[float] = []
-    for number, title, body, tenant_id, sigs in tickets:
+    for _number, title, body, tenant_id, sigs in tickets:
         query = f"{title}\n{body[:500]}"
         t0 = time.perf_counter()
         qvec = embed_query(embedder, query)
