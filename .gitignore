@@ -27,3 +27,7 @@ infra/terraform.tfvars
 # Campaign log stays local, never committed
 PHASES.md
 CLAUDE.md
+
+# Terraform plan artifacts must never be committed (leak resolved vars/state)
+infra/tfplan
+*.tfplan
