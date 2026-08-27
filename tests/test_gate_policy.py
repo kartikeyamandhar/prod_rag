@@ -53,3 +53,38 @@ def test_degraded_but_info_starved_still_requests_info() -> None:
     # degraded or not (A9: the old hand-built path wrongly escalated these).
     decision = decide_route(0.9, 0.9, has_citations=True, body_chars=10, degraded=True)
     assert decision.route == "request_info"
+
+
+def test_insufficient_context_requests_info_even_when_confident() -> None:
+    # Audit B2: drafts openly admitting ignorance were auto-attached.
+    decision = decide_route(
+        triage_confidence=0.95,
+        retrieval_confidence=0.9,
+        has_citations=True,
+        body_chars=500,
+        context_sufficiency=2,
+    )
+    assert decision.route == "request_info"
+
+
+def test_sufficiency_blend_three_way() -> None:
+    decision = decide_route(
+        triage_confidence=1.0,
+        retrieval_confidence=1.0,
+        has_citations=True,
+        body_chars=500,
+        context_sufficiency=5,
+    )
+    # 0.4*1.0 + 0.3*1.0 + 0.3*(5/5) = 1.0 -> auto_attach
+    assert decision.confidence == 1.0
+    assert decision.route == "auto_attach"
+
+
+def test_no_sufficiency_falls_back_to_two_way_blend() -> None:
+    decision = decide_route(
+        triage_confidence=0.8,
+        retrieval_confidence=0.6,
+        has_citations=True,
+        body_chars=500,
+    )
+    assert decision.confidence == 0.7

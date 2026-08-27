@@ -37,7 +37,8 @@ def main() -> None:
     with psycopg.connect(os.environ["DATABASE_URL"]) as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT number, title, body, tenant_id, sigs, closing_pr_url"
+                "SELECT number, title, body, tenant_id, sigs, closing_pr_url,"
+                " closing_pr_title, closing_pr_body"
                 " FROM tickets WHERE is_held_out ORDER BY number DESC LIMIT %s",
                 (N,),
             )
@@ -53,7 +54,9 @@ def main() -> None:
             )
             response = handle_ticket(conn, embedder, ticket, llm=pipeline_llm)
             draft = response.draft.model_dump()
-            scores = judge_draft(judge_llm, row, draft)
+            cited_sources = {c["source"] for c in draft["citations"]}
+            cited_context = [r for r in response.retrieval if r["key"] in cited_sources]
+            scores = judge_draft(judge_llm, row, draft, cited_context)
             results.append(
                 {
                     "ticket": row["number"],

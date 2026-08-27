@@ -23,10 +23,6 @@ from triage.stub import Triage, triage_ticket
 
 logger = logging.getLogger(__name__)
 
-# Perfect two-list agreement at rank 1 scores 2/61; top-1 in one list scores 1/61.
-# KNOWN DEGENERACY (replaced in gate v2): with empty FTS lists this ceiling makes
-# retrieval confidence a constant 0.5.
-RETRIEVAL_SCORE_CEILING = 2 / 61
 # Kubernetes minor versions are 1.two-digits; \b keeps "took 1.5 seconds" out.
 _VERSION_PATTERN = re.compile(r"\bv?1\.\d{2}\b")
 DRAFT_TEXT_CHARS = 1600  # per-item context slice shared with the judge
@@ -39,6 +35,8 @@ class Citation(BaseModel):
 
 
 class Draft(BaseModel):
+    # None on extractive/degraded drafts: only the LLM drafter self-assesses.
+    context_sufficiency: int | None = None
     probable_cause: str
     suggested_fix: str
     citations: list[Citation]
@@ -59,6 +57,20 @@ class FirstResponse(BaseModel):
     degraded: bool = False
     degrade_reasons: list[str] = []
     timings_ms: dict[str, float]
+
+
+def compute_retrieval_confidence(items: list[RetrievedItem]) -> float:
+    """Deterministic retrieval-quality signal with real variance (replaces the
+    constant-0.5 ceiling ratio, audit A6):
+    0.5 * cross-list agreement in the top-k (item found by >=2 searches)
+    + 0.3 * any FTS list contributed at all
+    + 0.2 * normalized score margin of top-1 over the tail."""
+    if not items:
+        return 0.0
+    agreement = sum(1 for item in items if len(item.ranks) >= 2) / len(items)
+    fts_contributed = float(any("_fts" in name for item in items for name in item.ranks))
+    margin = (items[0].score - items[-1].score) / items[0].score if items[0].score else 0.0
+    return 0.5 * agreement + 0.3 * fts_contributed + 0.2 * min(1.0, margin)
 
 
 def build_draft(items: list[RetrievedItem], title: str, body: str) -> Draft:
@@ -166,13 +178,14 @@ def handle_ticket(
     # DRAFT forces escalate (incident-6 invariant is about retrieval-only content
     # reaching a human); a stub triage alone does not taint an LLM-written draft.
     degraded = triage_degraded or draft_degraded
-    retrieval_confidence = min(1.0, (items[0].score / RETRIEVAL_SCORE_CEILING) if items else 0.0)
+    retrieval_confidence = round(compute_retrieval_confidence(items), 3)
     route = decide_route(
         triage_confidence=triage.confidence,
-        retrieval_confidence=round(retrieval_confidence, 3),
+        retrieval_confidence=retrieval_confidence,
         has_citations=bool(draft.citations),
         body_chars=len(ticket.body),
         degraded=draft_degraded,
+        context_sufficiency=draft.context_sufficiency,
     )
     timings["draft_and_gate"] = round((time.perf_counter() - t0) * 1000, 2)
 

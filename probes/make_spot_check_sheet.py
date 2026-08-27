@@ -23,6 +23,10 @@ COLUMNS = [
     "url",
     "tenant_id",
     "truth_sigs",
+    "degraded",
+    "draft_source",
+    "route",
+    "degrade_reasons",
     "judge_grounding",
     "judge_cause_plausibility",
     "judge_actionability",
@@ -46,7 +50,7 @@ def main() -> None:
         writer = csv.writer(fh)
         writer.writerow(COLUMNS)
         for number, url, tenant_id, sigs in sorted(sample):
-            writer.writerow([number, url, tenant_id, "+".join(sigs), *[""] * 8])
+            writer.writerow([number, url, tenant_id, "+".join(sigs), *[""] * 12])
     print(f"SAMPLED {len(sample)} of {len(rows)} held-out tickets -> {out.relative_to(REPO_ROOT)}")
 
 

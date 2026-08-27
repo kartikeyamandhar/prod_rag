@@ -8,6 +8,7 @@ Run: uv run --env-file .env python -m tickets.load_tickets artifacts/tickets_<da
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 import sys
@@ -78,6 +79,14 @@ def main(parquet_path: Path) -> None:
             fetched = cur.fetchone()
     assert fetched is not None
     db_total, db_embedded = fetched
+    # Re-hydrate judge ground truth: the parquet snapshot predates these columns.
+    from tickets.fetch_pr_content import CACHE_PATH, hydrate
+
+    if CACHE_PATH.exists():
+        with psycopg.connect(database_url) as conn2:
+            hydrated = hydrate(conn2, json.loads(CACHE_PATH.read_text()))
+            logger.info("re-hydrated PR content on %d rows", hydrated)
+
     parquet_embedded = len(table.column("embedding").drop_null())
     print(f"DB tickets={db_total} embedded={db_embedded}")
     print(f"PARQUET tickets={table.num_rows} embedded={parquet_embedded}")

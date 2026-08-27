@@ -29,6 +29,7 @@ def test_parse_triage_validates_component() -> None:
 
 def test_parse_draft_rejects_citation_outside_context() -> None:
     raw = {
+        "context_sufficiency": 4,
         "probable_cause": "x",
         "suggested_fix": "y",
         "citations": [{"source": "docs:999999", "quote": "z"}],
@@ -39,14 +40,35 @@ def test_parse_draft_rejects_citation_outside_context() -> None:
 
 def test_parse_draft_accepts_valid_and_clips_quote() -> None:
     raw = {
+        "context_sufficiency": 4,
         "probable_cause": "cause",
         "suggested_fix": "fix",
         "citations": [{"source": "docs:1", "quote": "q" * 500}],
         "clarifying_questions": ["a", "b", "c", "d"],
     }
     draft = parse_draft(raw, allowed_keys={"docs:1"})
+    # Regression: pydantic extra="ignore" once silently dropped this field.
+    assert draft.context_sufficiency == 4
     assert len(draft.citations[0].quote) == 140
     assert len(draft.clarifying_questions) == 3
+
+
+def test_parse_draft_requires_context_sufficiency() -> None:
+    raw = {"probable_cause": "x", "suggested_fix": "y", "citations": []}
+    with pytest.raises(ValueError, match="context_sufficiency"):
+        parse_draft(raw, allowed_keys=set())
+    with pytest.raises(ValueError, match="context_sufficiency"):
+        parse_draft({**raw, "context_sufficiency": "4/5"}, allowed_keys=set())
+
+
+def test_parse_draft_uncited_allowed_only_when_insufficient() -> None:
+    base = {"probable_cause": "x", "suggested_fix": "y", "citations": []}
+    # Insufficient context (<=2): uncited is a legitimate shape the gate handles.
+    draft = parse_draft({**base, "context_sufficiency": 2}, allowed_keys={"docs:1"})
+    assert draft.citations == []
+    # Confident (>=3) but uncited: reject, that's the audit-B2 failure class.
+    with pytest.raises(ValueError, match="no valid citations"):
+        parse_draft({**base, "context_sufficiency": 3}, allowed_keys={"docs:1"})
 
 
 def test_extract_json_braces_inside_string_literals() -> None:

@@ -26,14 +26,20 @@ SYSTEM = (
 PROMPT = """Draft a first response for this support ticket using ONLY the context items.
 
 Return JSON:
-{{"probable_cause": "1-3 sentences, grounded in the context",
+{{"context_sufficiency": <1-5>,
+  "probable_cause": "1-3 sentences, grounded in the context",
   "suggested_fix": "1-4 sentences of concrete next steps, grounded in the context",
   "citations": [{{"source": "<key of a context item>", "quote": "<verbatim span, <=140 chars>"}}],
   "clarifying_questions": ["0-3 questions, only if information is genuinely missing"]}}
 
-Rules: cite 2-4 items; "source" MUST be copied exactly from the context item keys;
-quotes MUST be verbatim spans from that item's text. If the context does not
-explain the ticket, say so in probable_cause and ask for what you need.
+context_sufficiency anchors: 5 = the context fully explains this ticket's failure;
+4 = explains most of it; 3 = relevant but partial; 2 = topically related only;
+1 = the context is unrelated to the ticket.
+
+Rules: when context_sufficiency >= 3, cite 2-4 items; "source" MUST be copied
+exactly from the context item keys; quotes MUST be verbatim spans from that
+item's text. When context_sufficiency <= 2 you may cite fewer or none: say what
+is missing in probable_cause and ask for what you need.
 
 Ticket title: {title}
 Ticket body:
@@ -60,17 +66,27 @@ def _render_context(items: list[RetrievedItem]) -> str:
 
 
 def parse_draft(raw: dict, allowed_keys: set[str]) -> Draft:
+    sufficiency_raw = raw.get("context_sufficiency")
+    if (
+        not isinstance(sufficiency_raw, int)
+        or isinstance(sufficiency_raw, bool)
+        or not 1 <= sufficiency_raw <= 5
+    ):
+        raise ValueError(f"context_sufficiency missing or invalid: {sufficiency_raw!r}")
     citations = []
     for entry in raw.get("citations", []):
         source = entry.get("source", "")
         if source not in allowed_keys:
             raise ValueError(f"citation outside retrieved context: {source!r}")
         citations.append(Citation(source=source, url=None, quote=str(entry.get("quote", ""))[:140]))
-    if not citations:
-        raise ValueError("draft has no valid citations")
+    if not citations and sufficiency_raw >= 3:
+        # A confident draft must cite; an "insufficient context" draft (<=2) is a
+        # legitimate uncited shape that the gate routes to request-info.
+        raise ValueError("draft claims sufficient context but has no valid citations")
     if not raw.get("probable_cause") or not raw.get("suggested_fix"):
         raise ValueError("draft missing probable_cause or suggested_fix")
     return Draft(
+        context_sufficiency=sufficiency_raw,
         probable_cause=str(raw["probable_cause"]),
         suggested_fix=str(raw["suggested_fix"]),
         citations=citations,

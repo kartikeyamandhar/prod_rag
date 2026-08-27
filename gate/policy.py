@@ -34,13 +34,26 @@ def decide_route(
     has_citations: bool,
     body_chars: int,
     degraded: bool = False,
+    context_sufficiency: int | None = None,
 ) -> RouteDecision:
     """Every route decision flows through here, degraded paths included, so the
-    hard rules and the audit log hold on every request."""
-    confidence = round(0.5 * triage_confidence + 0.5 * retrieval_confidence, 3)
+    hard rules and the audit log hold on every request.
+
+    context_sufficiency is the draft's own 1-5 signal about its context; a draft
+    that says it cannot answer (<=2) must never auto-attach, and what it needs
+    is more information, so it routes request-info. This kills the failure class
+    where drafts openly admitting ignorance were auto-attached (audit B2)."""
+    if context_sufficiency is None:
+        confidence = round(0.5 * triage_confidence + 0.5 * retrieval_confidence, 3)
+    else:
+        confidence = round(
+            0.4 * triage_confidence + 0.3 * retrieval_confidence + 0.3 * (context_sufficiency / 5),
+            3,
+        )
     reasons = [
         f"triage_confidence={triage_confidence:.2f}",
         f"retrieval_confidence={retrieval_confidence:.2f}",
+        f"context_sufficiency={context_sufficiency}",
     ]
 
     if body_chars < MIN_BODY_CHARS:
@@ -49,6 +62,9 @@ def decide_route(
     elif degraded:
         reasons.append("degraded: retrieval-only draft, never auto-attached")
         decision = RouteDecision(route="escalate", confidence=confidence, reasons=reasons)
+    elif context_sufficiency is not None and context_sufficiency <= 2:
+        reasons.append("draft self-assessed context as insufficient (<=2): ask the customer")
+        decision = RouteDecision(route="request_info", confidence=confidence, reasons=reasons)
     elif not has_citations:
         reasons.append("draft has no citations: never auto-attach uncited advice")
         decision = RouteDecision(route="escalate", confidence=confidence, reasons=reasons)
