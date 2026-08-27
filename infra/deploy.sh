@@ -3,7 +3,16 @@
 # Usage: infra/deploy.sh [ip]   (ip defaults to terraform output)
 set -euo pipefail
 cd "$(dirname "$0")/.."
-IP=${1:-$(terraform -chdir=infra output -raw public_ip)}
+# terraform output is stale after stop/start (public IP changes); resolve live.
+resolve_ip() {
+  aws ec2 describe-instances \
+    --instance-ids "$(terraform -chdir=infra output -raw instance_id)" \
+    --region "${AWS_REGION:-us-west-2}" \
+    --query 'Reservations[0].Instances[0].PublicIpAddress' --output text
+}
+IP=${1:-$(resolve_ip)}
+# accept-new is TOFU onto a possibly recycled AWS IP; acceptable for a lab box
+# with nothing secret on it, noted deliberately.
 SSH="ssh -o StrictHostKeyChecking=accept-new ec2-user@$IP"
 
 echo "== waiting for first-boot provisioning =="
@@ -23,17 +32,25 @@ echo "== remote setup =="
 $SSH 'bash -s' <<'REMOTE'
 set -euo pipefail
 cd rag-incident-lab
+umask 077
+# Admin UIs stay loopback; reach via: ssh -L 3000:127.0.0.1:3000 -L 9090:127.0.0.1:9090
+# Grafana password is generated per deploy; recover with: grep GRAFANA .env
 cat > .env <<ENV
 DATABASE_URL=postgresql://rag:rag_local_dev@127.0.0.1:5433/rag
 POSTGRES_USER=rag
 POSTGRES_PASSWORD=rag_local_dev
 POSTGRES_DB=rag
 POSTGRES_PORT=5433
-BIND_HOST=0.0.0.0
+BIND_HOST=127.0.0.1
+GRAFANA_ADMIN_USER=admin
+GRAFANA_ADMIN_PASSWORD=$(openssl rand -hex 16)
 AWS_REGION=us-west-2
 BEDROCK_MODEL_ID=us.anthropic.claude-haiku-4-5-20251001-v1:0
 EMBED_MODEL_NAME=BAAI/bge-small-en-v1.5
+LLM_MAX_CONCURRENCY=3
+LLM_ACQUIRE_TIMEOUT_S=0.25
 ENV
+chmod 600 .env
 docker compose up -d --wait postgres prometheus grafana
 uv sync
 uv run --env-file .env python -m ingest.load_docs

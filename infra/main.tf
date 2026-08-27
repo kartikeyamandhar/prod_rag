@@ -50,8 +50,10 @@ resource "aws_security_group" "lab" {
   name        = "rag-incident-lab"
   description = "home-IP allowlist: ssh, api, grafana, prometheus"
 
+  # 3000/9090 (Grafana/Prometheus) are deliberately closed: admin UIs bind
+  # loopback on the box and are reached via ssh -L port-forwarding only.
   dynamic "ingress" {
-    for_each = [22, 8080, 3000, 9090]
+    for_each = [22, 8080]
     content {
       from_port   = ingress.value
       to_port     = ingress.value
@@ -91,6 +93,13 @@ resource "aws_iam_role_policy" "bedrock_invoke" {
       Resource = "*"
     }]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "ssm" {
+  # Break-glass access via SSM Session Manager: survives home-IP rotation,
+  # and allows running with every ingress rule closed if needed.
+  role       = aws_iam_role.lab.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_instance_profile" "lab" {
