@@ -6,22 +6,20 @@ only initialization is guarded.
 
 Honesty note (verified against fastembed 0.8.0): for BAAI/bge-small-en-v1.5,
 TextEmbedding.query_embed is identical to embed; NO query-side prefix is applied
-by the library. bge's asymmetric query instruction is therefore only used when
-EMBED_QUERY_PREFIX=1, a flag gated behind a measured A/B on the replay harness
-(adopt iff retrieval metrics are non-decreasing and MRR improves; else delete).
+by the library. The bge query instruction was A/B tested on the replay harness
+(artifacts/r2_fts_ab.json, 2026-08-27): identical same-SIG@8, docs-domain@8,
+and MRR with and without it on this workload, so per the pre-registered rule it
+is NOT applied. Queries and passages share one embedding convention.
 """
 
 from __future__ import annotations
 
 import logging
-import os
 import threading
 
 from fastembed import TextEmbedding
 
 logger = logging.getLogger(__name__)
-
-BGE_QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
 
 _lock = threading.Lock()
 _model: TextEmbedding | None = None
@@ -43,8 +41,6 @@ def get_query_embedder(model_name: str) -> TextEmbedding:
 
 
 def embed_query(model: TextEmbedding, query: str) -> list[float]:
-    """Embed one query. Prefixing is flag-gated pending the R2 A/B (see module doc)."""
-    if os.environ.get("EMBED_QUERY_PREFIX", "0") == "1":
-        query = BGE_QUERY_PREFIX + query
+    """Embed one query; same convention as passages (see module doc for why)."""
     vector = next(iter(model.embed([query])))
     return vector.tolist()
