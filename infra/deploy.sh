@@ -49,13 +49,14 @@ BEDROCK_MODEL_ID=us.anthropic.claude-haiku-4-5-20251001-v1:0
 EMBED_MODEL_NAME=BAAI/bge-small-en-v1.5
 LLM_MAX_CONCURRENCY=3
 LLM_ACQUIRE_TIMEOUT_S=0.25
+BEDROCK_ENABLED=1
 ENV
 chmod 600 .env
 docker compose up -d --wait postgres prometheus grafana
 uv sync
-uv run --env-file .env python -m ingest.load_docs
-SNAP=$(ls artifacts/tickets_2*.parquet | tail -1)
-uv run --env-file .env python -m tickets.load_tickets "$SNAP"
+# Single seed path: loads both corpora, resets replay state, re-hydrates PR
+# ground truth, and asserts the DB fingerprint against the committed baseline.
+uv run --env-file .env python -m probes.reset_corpus
 sudo tee /etc/systemd/system/rag-api.service > /dev/null <<'UNIT'
 [Unit]
 Description=rag-incident-lab API
@@ -63,8 +64,10 @@ After=docker.service network-online.target
 [Service]
 User=ec2-user
 WorkingDirectory=/home/ec2-user/rag-incident-lab
+EnvironmentFile=/home/ec2-user/rag-incident-lab/.env
 ExecStart=/usr/local/bin/uv run --env-file .env uvicorn api.main:app --host 0.0.0.0 --port 8080
-Restart=on-failure
+Restart=always
+RestartSec=3
 [Install]
 WantedBy=multi-user.target
 UNIT

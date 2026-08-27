@@ -248,13 +248,32 @@ Hard rules: stub outputs never produce published quality numbers; **no judged nu
 ## Quickstart
 
 ```sh
-make setup          # uv sync: Python 3.12, pinned dependencies
-cp .env.example .env
-make db-up          # pgvector Postgres on 127.0.0.1:5433
-make test           # 39 tests; DB-backed degradation test runs via --env-file
+make setup            # uv sync: Python 3.12, pinned dependencies
+cp .env.example .env  # set GITHUB_TOKEN (read-only public) for the ticket corpus build
+make db-up            # pgvector Postgres on 127.0.0.1:5433
+make test             # unit tests, no DB required
+
+# Build both corpora locally (the parquet snapshots are not committed: the
+# ticket snapshot contains full issue bodies, which this repo does not
+# republish; the docs corpus rebuilds deterministically from the pinned SHA):
+uv run python -m ingest.build_docs_corpus
+uv run --env-file .env python -m tickets.build_ticket_corpus
+
+make seed             # load both corpora, reset replay state, verify DB fingerprint
+make test-integration # full suite including DB-backed tests
 ```
 
-Corpus build: `uv run python -m ingest.build_docs_corpus`, then `uv run --env-file .env python -m ingest.load_docs` (tickets analogous under `tickets/`). API: `uv run --env-file .env uvicorn api.main:app --port 8080`. AWS: `terraform -chdir=infra apply`, `bash infra/deploy.sh`, and `infra/stop_instance.sh` + `infra/residual_check.sh` when done (the discipline is stop between sessions, residual-check every weekend).
+A rebuilt ticket snapshot can drift from the original 2026-08-19 pull (issue
+bodies and labels are editable upstream), so `make seed` on a fresh rebuild
+will report a fingerprint mismatch against the committed baseline: delete
+`artifacts/db_fingerprint_baseline.json` once to re-baseline your snapshot.
+Measured numbers in this README come from the original snapshot.
+
+API: `uv run --env-file .env uvicorn api.main:app --port 8080`. AWS:
+`cp infra/terraform.tfvars.example infra/terraform.tfvars` (set your CIDR),
+`terraform -chdir=infra apply`, `bash infra/deploy.sh`, and
+`infra/stop_instance.sh` + `infra/residual_check.sh` when done (the discipline
+is stop between sessions, residual-check every weekend).
 
 ## Relationship to airflow_sec_rag
 

@@ -124,8 +124,10 @@ def apply_commit(conn: psycopg.Connection, repo: Repo, model: TextEmbedding, sha
                     after = 0
                 elif change.change_type == "renamed":
                     assert change.old_path is not None
-                    _delete_page(cur, change.old_path)
-                    before, after = _upsert_page(cur, repo, model, sha, change.path)
+                    # chunks_before = chunks under the OLD path (audit A12: the
+                    # delete count was discarded and renames logged before=0).
+                    before = _delete_page(cur, change.old_path)
+                    _, after = _upsert_page(cur, repo, model, sha, change.path)
                 else:
                     before, after = _upsert_page(cur, repo, model, sha, change.path)
                 cur.execute(
@@ -153,6 +155,28 @@ def apply_commit(conn: psycopg.Connection, repo: Repo, model: TextEmbedding, sha
     return len(changes)
 
 
+def load_state(conn: psycopg.Connection, start_sha: str) -> str:
+    """Seed-or-read replay state, leaving the connection OUTSIDE a transaction.
+    The final commit ends the implicit transaction the SELECT opened; without
+    it, apply_commit's conn.transaction() degrades to a SAVEPOINT inside one
+    giant transaction and a crash on tick N rolls back ticks 1..N-1 (audit
+    A11; observed live: 143 applied commits invisible to other connections
+    until the process exited)."""
+    with conn.cursor() as cur:
+        cur.execute(
+            "INSERT INTO replay_state (id, current_sha) VALUES (1, %s)"
+            " ON CONFLICT (id) DO NOTHING",
+            (start_sha,),
+        )
+        conn.commit()
+        cur.execute("SELECT current_sha FROM replay_state WHERE id = 1")
+        row = cur.fetchone()
+        assert row is not None
+        current = row[0]
+    conn.commit()
+    return current
+
+
 def tick(database_url: str, model_name: str, start_sha: str, n_ticks: int) -> None:
     repo = Repo(CORPUS_DIR)
     model = get_query_embedder(model_name)
@@ -160,17 +184,7 @@ def tick(database_url: str, model_name: str, start_sha: str, n_ticks: int) -> No
         conn.execute(SCHEMA)
         conn.commit()
         register_vector(conn)
-        with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO replay_state (id, current_sha) VALUES (1, %s)"
-                " ON CONFLICT (id) DO NOTHING",
-                (start_sha,),
-            )
-            conn.commit()
-            cur.execute("SELECT current_sha FROM replay_state WHERE id = 1")
-            row = cur.fetchone()
-            assert row is not None
-            current = row[0]
+        current = load_state(conn, start_sha)
 
         pending = repo.git.rev_list(
             "--reverse", f"{current}..origin/main", "--", SPARSE_PATH

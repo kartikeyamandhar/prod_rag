@@ -153,12 +153,15 @@ def _docs_fts(
     ]
 
 
-def _ticket_filters(tenant_id: int, tenant_filter_enabled: bool) -> tuple[str, list]:
+def _ticket_filters(tenant_id: int, tenant_filter_enabled: bool) -> tuple[str, dict]:
+    """Named parameters throughout: clause order can never silently re-bind a
+    value to the wrong placeholder (audit C7: the positional form put the FTS
+    query before the tenant filter purely by textual position)."""
     clauses = ["embedding IS NOT NULL", "NOT is_held_out"]
-    params: list = []
+    params: dict = {}
     if tenant_filter_enabled:
-        clauses.append("tenant_id = %s")
-        params.append(tenant_id)
+        clauses.append("tenant_id = %(tenant_id)s")
+        params["tenant_id"] = tenant_id
     else:
         logger.warning("tenant filter DISABLED on ticket retrieval", extra={"tenant_id": tenant_id})
     return " AND ".join(clauses), params
@@ -170,8 +173,9 @@ def _tickets_vector(
     where, params = _ticket_filters(tenant_id, enabled)
     cur.execute(
         f"SELECT number, title, array_to_string(sigs, ','), embed_text, url"
-        f" FROM tickets WHERE {where} ORDER BY embedding <=> %s::vector LIMIT %s",
-        (*params, qvec, k),
+        f" FROM tickets WHERE {where}"
+        f" ORDER BY embedding <=> %(qvec)s::vector LIMIT %(k)s",
+        {**params, "qvec": qvec, "k": k},
     )
     return [
         (
@@ -207,9 +211,9 @@ def _tickets_fts(
     where, params = _ticket_filters(tenant_id, enabled)
     cur.execute(
         f"SELECT number, title, array_to_string(sigs, ','), embed_text, url"
-        f" FROM tickets, {fn}('english', %s) q"
-        f" WHERE {where} AND tsv @@ q ORDER BY ts_rank_cd(tsv, q) DESC, number LIMIT %s",
-        (fts_query, *params, k),
+        f" FROM tickets, {fn}('english', %(q)s) q"
+        f" WHERE {where} AND tsv @@ q ORDER BY ts_rank_cd(tsv, q) DESC, number LIMIT %(k)s",
+        {**params, "q": fts_query, "k": k},
     )
     return [
         (
