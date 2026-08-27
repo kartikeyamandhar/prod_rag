@@ -31,3 +31,4 @@ CLAUDE.md
 # Terraform plan artifacts must never be committed (leak resolved vars/state)
 infra/tfplan
 *.tfplan
+artifacts/.run_ordinal

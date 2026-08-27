@@ -1,8 +1,21 @@
-// Shared payloads and request helper for all k6 scenarios.
+// Shared payloads, classified request helper, and summary export for k6 scenarios.
+//
+// v2 (audit B5): every request is classified by outcome (llm_completed /
+// degraded_completed / http_error) with a latency Trend per class, because a
+// degraded 200 and an LLM 200 are different outputs and averaging them
+// produced v1's misleading "median 365ms". Checks assert protocol shape only;
+// arm expectations (EXPECT_DEGRADED=none|any) are asserted when supplied.
 import http from "k6/http";
 import { check } from "k6";
+import { Counter, Trend } from "k6/metrics";
 
 export const API = __ENV.API_URL || "http://127.0.0.1:8080";
+
+export const llmCompleted = new Counter("llm_completed");
+export const degradedCompleted = new Counter("degraded_completed");
+export const httpErrors = new Counter("http_error");
+export const llmLatency = new Trend("llm_latency_ms", true);
+export const degradedLatency = new Trend("degraded_latency_ms", true);
 
 // Realistic ticket shapes across the three SIG domains; tenant ids spread out.
 export const PAYLOADS = [
@@ -22,13 +35,59 @@ export function postTicket(index) {
   const payload = PAYLOADS[index % PAYLOADS.length];
   const res = http.post(`${API}/tickets`, JSON.stringify(payload), {
     headers: { "Content-Type": "application/json" },
+    timeout: "115s", // under gracefulStop so slow requests complete, not censor
   });
-  check(res, {
+
+  let degraded = null;
+  let route = null;
+  if (res.status === 200) {
+    try {
+      const data = res.json();
+      degraded = data.degraded;
+      route = data.route.route;
+    } catch (e) { /* classified below as shape failure */ }
+  }
+
+  if (res.status === 200 && degraded === false) {
+    llmCompleted.add(1);
+    llmLatency.add(res.timings.duration);
+  } else if (res.status === 200 && degraded === true) {
+    degradedCompleted.add(1);
+    degradedLatency.add(res.timings.duration);
+  } else {
+    httpErrors.add(1);
+  }
+
+  const checks = {
     "status 200": (r) => r.status === 200,
-    "has route": (r) => {
-      try { return ["auto_attach", "escalate", "request_info"].includes(r.json().route.route); }
-      catch (e) { return false; }
-    },
-  });
+    "valid route": () => ["auto_attach", "escalate", "request_info"].includes(route),
+  };
+  if (__ENV.EXPECT_DEGRADED === "none") {
+    checks["arm expects no degraded responses"] = () => degraded === false;
+  }
+  check(res, checks);
   return res;
+}
+
+// Full metric export per arm; TAG names the artifact. dropped_iterations, when
+// present, are load-generator saturation (VUs exhausted), not server failures.
+export function summaryFor(prefix) {
+  return function (data) {
+    const tag = __ENV.TAG || "untagged";
+    const out = {};
+    out[`artifacts/incidents/${prefix}_${tag}_k6.json`] = JSON.stringify(
+      {
+        tag: tag,
+        api: API,
+        expect_degraded: __ENV.EXPECT_DEGRADED || "unset",
+        git_sha: __ENV.GIT_SHA || "unset",
+        note_dropped_iterations: "load-generator artifact (VU pool exhausted), not a server failure",
+        metrics: data.metrics,
+        checks_root_group: data.root_group,
+      },
+      null,
+      1,
+    );
+    return out;
+  };
 }

@@ -42,3 +42,15 @@ def test_embed_text_strips_fences_and_truncates() -> None:
     assert "after" in text
     long_body = "word " * 2000
     assert len(make_embed_text("t", long_body)) == 1600
+
+
+def test_captioned_embed_text_budget_partition() -> None:
+    from tickets.corpus_rules import make_captioned_embed_text
+
+    # Audit A14: a long body must survive long captions (fixed budgets, no eviction).
+    text = make_captioned_embed_text("X" * 500, "Y" * 5000, "Z" * 2000)
+    assert text.count("X") == 200
+    assert text.count("Z") == 400
+    assert text.count("Y") == 1200
+    # No captions: no empty "Image content:" stanza.
+    assert "Image content" not in make_captioned_embed_text("title", "body", "")

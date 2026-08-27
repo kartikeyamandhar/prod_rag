@@ -1,15 +1,22 @@
-"""Incident 2 probe: stale-serving incidence for pages changed upstream.
+"""Incident 2 probe v2: content-hash staleness, measured through the real path.
 
-For every page the pending upstream commits modify, query retrieval with the page
-title and check whether the top-5 docs results serve chunks from a page that is
-stale (DB corpus_sha still at a commit older than the upstream change).
+v1 defined stale as corpus_sha == pin, which after a full replay is empty by
+definition (the metric restated the tick counter, audit B9), and probed with
+raw vector top-5 using each page's own title as the query (near-tautological).
+v2: a DB page is STALE iff chunking the origin/main version of its file yields
+different text than the DB holds (content actually changed, not just SHA
+bookkeeping); queries are held-out ticket titles+bodies through hybrid_search,
+the pipeline's actual retrieval path. Denominators disclosed: pages modified
+upstream, of those content-changed vs chunk-identical, plus added/deleted
+pages this metric cannot see.
 
-Run (box or laptop): uv run --env-file .env python -m probes.staleness_probe --tag before
+Run: uv run --env-file .env python -m probes.staleness_probe --tag before
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -17,61 +24,116 @@ from pathlib import Path
 import psycopg
 from git import Repo
 
+from ingest.chunker import chunk_page
 from ingest.clone_docs import CORPUS_DIR, SPARSE_PATH
 from ingest.manifest import load_manifest
+from probes.run_meta import run_meta
 from retrieval.embedder import embed_query, get_query_embedder
-from updater.replayer import parse_name_status
+from retrieval.search import hybrid_search
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+OUT_DIR = REPO_ROOT / "artifacts" / "incidents"
+
+
+def _chunk_hash(path: str, raw_markdown: str) -> str:
+    page = chunk_page(path, raw_markdown)
+    joined = "\n".join(chunk.text for chunk in page.chunks)
+    return hashlib.md5(joined.encode()).hexdigest()
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--tag", required=True)
+    parser.add_argument("--no-fetch", action="store_true", help="skip git fetch (offline rerun)")
     args = parser.parse_args()
 
     manifest = load_manifest(REPO_ROOT / "corpus_manifest.toml")
     pin = manifest.docs_corpus.start_sha
     repo = Repo(CORPUS_DIR)
+    if not args.no_fetch:
+        repo.git.fetch("origin", "main")
+
+    from updater.replayer import parse_name_status
+
     diff_text = repo.git.diff("--name-status", "-M", pin, "origin/main", "--", SPARSE_PATH)
-    changed = [c.path for c in parse_name_status(diff_text) if c.change_type == "modified"]
+    changes = parse_name_status(diff_text)
+    modified = [c.path for c in changes if c.change_type == "modified"]
+    added = [c.path for c in changes if c.change_type == "added"]
+    deleted = [c.path for c in changes if c.change_type == "deleted"]
+    renamed = [c.path for c in changes if c.change_type == "renamed"]
 
     embedder = get_query_embedder(os.environ["EMBED_MODEL_NAME"])
-    rows = []
-    with psycopg.connect(os.environ["DATABASE_URL"]) as conn, conn.cursor() as cur:
-        cur.execute("SELECT path, title, corpus_sha FROM pages WHERE path = ANY(%s)", (changed,))
-        page_info = {path: (title, sha) for path, title, sha in cur.fetchall()}
-        # A changed page is stale while its DB corpus_sha predates the upstream change,
-        # i.e. it is still at the pin (or an already-applied commit that is not the
-        # one touching it). Simplification that holds here: stale == corpus_sha == pin.
-        stale_pages = {p for p, (_, sha) in page_info.items() if sha == pin}
+    with psycopg.connect(os.environ["DATABASE_URL"]) as conn:
+        # Stale = the upstream edit actually changes what our chunker would store.
+        stale_pages: set[str] = set()
+        chunk_identical: list[str] = []
+        missing_from_db: list[str] = []
+        with conn.cursor() as cur:
+            for path in modified:
+                cur.execute(
+                    "SELECT md5(string_agg(c.text, E'\\n' ORDER BY c.chunk_index))"
+                    " FROM chunks c JOIN pages p ON p.id = c.page_id WHERE p.path = %s",
+                    (path,),
+                )
+                fetched = cur.fetchone()
+                db_hash = fetched[0] if fetched else None
+                if db_hash is None:
+                    missing_from_db.append(path)
+                    continue
+                upstream_raw = repo.git.show(f"origin/main:{path}")
+                if _chunk_hash(path, upstream_raw) != db_hash:
+                    stale_pages.add(path)
+                else:
+                    chunk_identical.append(path)
 
-        for path in changed:
-            if path not in page_info:
-                continue
-            title, _ = page_info[path]
-            qvec = embed_query(embedder, title)
             cur.execute(
-                "SELECT p.path FROM chunks c JOIN pages p ON p.id = c.page_id"
-                " ORDER BY c.embedding <=> %s::vector LIMIT 5",
-                (qvec,),
+                "SELECT number, title, body, tenant_id FROM tickets"
+                " WHERE is_held_out ORDER BY number"
             )
-            top_paths = [r[0] for r in cur.fetchall()]
-            served_stale = [p for p in top_paths if p in stale_pages]
-            rows.append({"query": title, "page": path, "stale_chunks_in_top5": len(served_stale)})
+            tickets = cur.fetchall()
+
+        rows = []
+        for number, title, body, tenant_id in tickets:
+            query = f"{title}\n{body[:500]}"
+            qvec = embed_query(embedder, query)
+            items = hybrid_search(conn, qvec, query, tenant_id)
+            stale_served = [
+                item.key for item in items if item.corpus == "docs" and item.url in stale_pages
+            ]
+            rows.append(
+                {"ticket": number, "stale_docs_in_top8": len(stale_served), "keys": stale_served}
+            )
+
+        meta = run_meta(conn)
 
     n = len(rows)
-    incidence = sum(1 for r in rows if r["stale_chunks_in_top5"] > 0)
+    incidence = sum(1 for r in rows if r["stale_docs_in_top8"] > 0)
     report = {
         "incident": 2,
         "tag": args.tag,
-        "changed_pages_probed": n,
-        "stale_pages_in_db": len(stale_pages),
-        "queries_serving_stale_content": incidence,
+        "staleness_definition": "chunked origin/main text differs from DB chunk text",
+        "upstream_pages": {
+            "modified": len(modified),
+            "of_modified_content_changed": len(stale_pages),
+            "of_modified_chunk_identical": len(chunk_identical),
+            "of_modified_missing_from_db": len(missing_from_db),
+            "added_not_measurable": len(added),
+            "deleted_not_measurable": len(deleted),
+            "renamed_not_measurable": len(renamed),
+        },
+        "stale_pages": sorted(stale_pages),
+        "queries": n,
+        "queries_serving_stale_docs": incidence,
         "stale_serving_incidence": round(incidence / n, 3) if n else None,
         "rows": rows,
+        "run_meta": meta,
     }
-    print(json.dumps(report, indent=1))
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    out = OUT_DIR / f"incident2_{args.tag}.json"
+    out.write_text(json.dumps(report, indent=1) + "\n")
+    summary = {k: v for k, v in report.items() if k not in ("rows", "stale_pages")}
+    print(json.dumps(summary, indent=1))
+    print(f"-> {out.relative_to(REPO_ROOT)}")
 
 
 if __name__ == "__main__":

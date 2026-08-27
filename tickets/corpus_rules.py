@@ -53,3 +53,16 @@ def make_embed_text(title: str, body: str | None, max_chars: int = 1600) -> str:
     """
     stripped = _FENCE.sub(" ", body or "")
     return f"{title}\n\n{stripped}".strip()[:max_chars]
+
+
+def make_captioned_embed_text(title: str, body: str | None, captions: str) -> str:
+    """Captioned corpus row with a fixed budget partition (title 200 + captions
+    400 + body 1200), so captions can never evict the body from the embed
+    window (audit A14: one 3640-char body went 100% absent under v1's shared
+    1600-char cap)."""
+    stripped = _FENCE.sub(" ", body or "")
+    parts = [title[:200]]
+    if captions:
+        parts.append(f"Image content: {captions[:400]}")
+    parts.append(stripped[:1200])
+    return "\n\n".join(p for p in parts if p).strip()
