@@ -46,12 +46,17 @@ def healthz() -> dict:
 
 @app.post("/tickets")
 def tickets(ticket: TicketIn) -> FirstResponse:
-    if not 0 <= ticket.tenant_id < 50:
-        raise HTTPException(status_code=422, detail="tenant_id must be in [0, 50)")
+    from tickets.corpus_rules import TENANT_COUNT
+
+    if not 0 <= ticket.tenant_id < TENANT_COUNT:
+        raise HTTPException(status_code=422, detail=f"tenant_id must be in [0, {TENANT_COUNT})")
     if not ticket.title.strip():
         raise HTTPException(status_code=422, detail="title must be non-empty")
     try:
-        with psycopg.connect(_state["database_url"], connect_timeout=5) as conn:
+        # autocommit: the request path is read-only SELECTs; without it, psycopg
+        # opens a transaction at the first query that then idles across the
+        # multi-second Bedrock call, pinning MVCC snapshots and blocking vacuum.
+        with psycopg.connect(_state["database_url"], connect_timeout=5, autocommit=True) as conn:
             return handle_ticket(conn, _state["model"], ticket, llm=_state.get("llm"))
     except psycopg.OperationalError as exc:
         logger.error("database unavailable", extra={"error": str(exc)})

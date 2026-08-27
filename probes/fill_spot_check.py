@@ -14,6 +14,7 @@ import csv
 import json
 import logging
 import os
+import time
 from pathlib import Path
 
 import psycopg
@@ -42,6 +43,7 @@ def main() -> None:
         DRAFTS.open("w", encoding="utf-8") as drafts_out,
     ):
         for row in rows:
+            time.sleep(float(os.environ.get("PROBE_PACING_S", "8")))
             number = int(row["ticket_number"])
             with conn.cursor() as cur:
                 cur.execute(

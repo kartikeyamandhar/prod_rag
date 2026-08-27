@@ -33,7 +33,10 @@ def decide_route(
     retrieval_confidence: float,
     has_citations: bool,
     body_chars: int,
+    degraded: bool = False,
 ) -> RouteDecision:
+    """Every route decision flows through here, degraded paths included, so the
+    hard rules and the audit log hold on every request."""
     confidence = round(0.5 * triage_confidence + 0.5 * retrieval_confidence, 3)
     reasons = [
         f"triage_confidence={triage_confidence:.2f}",
@@ -43,6 +46,9 @@ def decide_route(
     if body_chars < MIN_BODY_CHARS:
         reasons.append(f"body {body_chars} chars < {MIN_BODY_CHARS}: information-starved")
         decision = RouteDecision(route="request_info", confidence=confidence, reasons=reasons)
+    elif degraded:
+        reasons.append("degraded: retrieval-only draft, never auto-attached")
+        decision = RouteDecision(route="escalate", confidence=confidence, reasons=reasons)
     elif not has_citations:
         reasons.append("draft has no citations: never auto-attach uncited advice")
         decision = RouteDecision(route="escalate", confidence=confidence, reasons=reasons)

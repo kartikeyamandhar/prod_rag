@@ -1,8 +1,15 @@
 from retrieval.search import RetrievedItem, rrf_merge
 
-PAYLOAD_A = {"corpus": "docs", "title": "A", "context": "", "snippet": "", "url": None}
-PAYLOAD_B = {"corpus": "tickets", "title": "B", "context": "", "snippet": "", "url": None}
-PAYLOAD_C = {"corpus": "docs", "title": "C", "context": "", "snippet": "", "url": None}
+PAYLOAD_A = {"corpus": "docs", "title": "A", "context": "", "text": "", "snippet": "", "url": None}
+PAYLOAD_B = {
+    "corpus": "tickets",
+    "title": "B",
+    "context": "",
+    "text": "",
+    "snippet": "",
+    "url": None,
+}
+PAYLOAD_C = {"corpus": "docs", "title": "C", "context": "", "text": "", "snippet": "", "url": None}
 
 
 def test_item_in_two_lists_outranks_single_list_winner() -> None:

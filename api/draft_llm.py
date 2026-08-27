@@ -44,11 +44,17 @@ Context items:
 """
 
 
+# Per-item context budget: matches the ticket-corpus embed window, so the model
+# drafts from what was actually indexed. 8 items x 1600 chars ~ 3.2k tokens.
+DRAFT_CONTEXT_CHARS = 1600
+
+
 def _render_context(items: list[RetrievedItem]) -> str:
     lines = []
     for item in items:
         lines.append(
-            f"[{item.key}] ({item.corpus}) {item.title}\n  url: {item.url}\n  text: {item.snippet}"
+            f"[{item.key}] ({item.corpus}) {item.title}\n  url: {item.url}\n"
+            f"  text: {item.text[:DRAFT_CONTEXT_CHARS]}"
         )
     return "\n".join(lines)
 
@@ -76,13 +82,15 @@ def draft_llm(llm: BedrockLLM, title: str, body: str, items: list[RetrievedItem]
     allowed = {item.key for item in items}
     url_by_key = {item.key: item.url for item in items}
     prompt = PROMPT.format(title=title, body=body[:2000], context=_render_context(items))
+    last_error: Exception | None = None
     for attempt in (1, 2):
-        text = llm.converse(SYSTEM, prompt, max_tokens=700, temperature=0.2)
+        text = llm.converse(SYSTEM, prompt, max_tokens=1200, temperature=0.2)
         try:
             draft = parse_draft(extract_json(text), allowed)
             for citation in draft.citations:
                 citation.url = url_by_key.get(citation.source)
             return draft
         except (ValueError, ValidationError, KeyError) as exc:
+            last_error = exc
             logger.warning("draft parse failed (attempt %d): %s", attempt, exc)
-    raise ValueError("draft output failed validation twice")
+    raise ValueError(f"draft output failed validation twice; last: {last_error}")

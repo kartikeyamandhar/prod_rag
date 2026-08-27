@@ -40,3 +40,16 @@ def test_no_citations_forces_escalate_even_when_confident() -> None:
 def test_hard_rule_precedence_short_body_beats_missing_citations() -> None:
     decision = decide_route(0.9, 0.9, has_citations=False, body_chars=10)
     assert decision.route == "request_info"
+
+
+def test_degraded_forces_escalate_even_when_confident() -> None:
+    decision = decide_route(0.95, 0.95, has_citations=True, body_chars=LONG_BODY, degraded=True)
+    assert decision.route == "escalate"
+    assert any("degraded" in reason for reason in decision.reasons)
+
+
+def test_degraded_but_info_starved_still_requests_info() -> None:
+    # Hard-rule precedence: an information-starved ticket needs the customer,
+    # degraded or not (A9: the old hand-built path wrongly escalated these).
+    decision = decide_route(0.9, 0.9, has_citations=True, body_chars=10, degraded=True)
+    assert decision.route == "request_info"

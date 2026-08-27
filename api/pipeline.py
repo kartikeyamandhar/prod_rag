@@ -24,8 +24,12 @@ from triage.stub import Triage, triage_ticket
 logger = logging.getLogger(__name__)
 
 # Perfect two-list agreement at rank 1 scores 2/61; top-1 in one list scores 1/61.
+# KNOWN DEGENERACY (replaced in gate v2): with empty FTS lists this ceiling makes
+# retrieval confidence a constant 0.5.
 RETRIEVAL_SCORE_CEILING = 2 / 61
-_VERSION_PATTERN = re.compile(r"v?1\.\d+")
+# Kubernetes minor versions are 1.two-digits; \b keeps "took 1.5 seconds" out.
+_VERSION_PATTERN = re.compile(r"\bv?1\.\d{2}\b")
+DRAFT_TEXT_CHARS = 1600  # per-item context slice shared with the judge
 
 
 class Citation(BaseModel):
@@ -53,6 +57,7 @@ class FirstResponse(BaseModel):
     draft: Draft
     route: RouteDecision
     degraded: bool = False
+    degrade_reasons: list[str] = []
     timings_ms: dict[str, float]
 
 
@@ -62,7 +67,7 @@ def build_draft(items: list[RetrievedItem], title: str, body: str) -> Draft:
 
     if tickets:
         probable_cause = (
-            f"Closest resolved ticket for this tenant: '{tickets[0].title.strip()}'"
+            f"Closest resolved ticket in scope: '{tickets[0].title.strip()}'"
             f" ({tickets[0].url}). The failure mode is likely related."
         )
     elif docs:
@@ -72,13 +77,13 @@ def build_draft(items: list[RetrievedItem], title: str, body: str) -> Draft:
 
     if docs:
         suggested_fix = (
-            f"Per '{docs[0].title}' ({docs[0].context or 'overview'}): {docs[0].snippet.strip()}"
+            f"Per '{docs[0].title}' ({docs[0].context or 'overview'}): {docs[0].text.strip()[:400]}"
         )
     else:
         suggested_fix = "Insufficient documentation context; see clarifying questions."
 
     citations = [
-        Citation(source=item.key, url=item.url, quote=item.snippet.strip()[:140])
+        Citation(source=item.key, url=item.url, quote=item.text.strip()[:140])
         for item in docs + tickets
     ]
 
@@ -107,21 +112,27 @@ def handle_ticket(
 ) -> FirstResponse:
     # Deferred import: draft_llm imports this module's response models.
     from api.draft_llm import draft_llm
-    from api.llm import LLMUnavailable
+    from api.llm import LLMPermanentError, LLMUnavailable
     from triage.llm_triage import triage_llm
 
     timings: dict[str, float] = {}
-    degraded = False
+    # Independent latches: a triage failure must not disable LLM drafting.
+    triage_degraded = False
+    draft_degraded = False
+    degrade_reasons: list[str] = []
 
     t0 = time.perf_counter()
     if llm is not None:
         try:
             triage = triage_llm(llm, ticket.title, ticket.body)  # type: ignore[arg-type]
-        except (LLMUnavailable, ValueError) as exc:
+        except (LLMUnavailable, LLMPermanentError, ValueError) as exc:
             if os.environ.get("DEGRADE_DISABLED", "0") == "1":
                 raise  # incident 6 "before": the naive system without a degrade path
-            logger.warning("triage degraded to stub", extra={"reason": str(exc)})
-            degraded = True
+            reason = f"triage: {type(exc).__name__}: {exc}"
+            degrade_reasons.append(reason)
+            level = logging.ERROR if isinstance(exc, LLMPermanentError) else logging.WARNING
+            logger.log(level, "triage degraded to stub", extra={"reason": reason})
+            triage_degraded = True
             triage = triage_ticket(ticket.title, ticket.body)
     else:
         triage = triage_ticket(ticket.title, ticket.body)
@@ -136,34 +147,33 @@ def handle_ticket(
     timings["retrieval"] = round((time.perf_counter() - t0) * 1000, 2)
 
     t0 = time.perf_counter()
-    if llm is not None and not degraded:
+    if llm is not None:
         try:
             draft = draft_llm(llm, ticket.title, ticket.body, items)  # type: ignore[arg-type]
-        except (LLMUnavailable, ValueError) as exc:
+        except (LLMUnavailable, LLMPermanentError, ValueError) as exc:
             if os.environ.get("DEGRADE_DISABLED", "0") == "1":
                 raise
-            logger.warning("draft degraded to extractive", extra={"reason": str(exc)})
-            degraded = True
+            reason = f"draft: {type(exc).__name__}: {exc}"
+            degrade_reasons.append(reason)
+            level = logging.ERROR if isinstance(exc, LLMPermanentError) else logging.WARNING
+            logger.log(level, "draft degraded to extractive", extra={"reason": reason})
+            draft_degraded = True
             draft = build_draft(items, ticket.title, ticket.body)
     else:
         draft = build_draft(items, ticket.title, ticket.body)
 
+    # API field: degraded if ANY stage degraded. Gate hard rule: only a degraded
+    # DRAFT forces escalate (incident-6 invariant is about retrieval-only content
+    # reaching a human); a stub triage alone does not taint an LLM-written draft.
+    degraded = triage_degraded or draft_degraded
     retrieval_confidence = min(1.0, (items[0].score / RETRIEVAL_SCORE_CEILING) if items else 0.0)
-    if degraded:
-        # Incident 6 invariant: retrieval-only draft always routes to a human.
-        route = RouteDecision(
-            route="escalate",
-            confidence=round(0.5 * triage.confidence + 0.5 * retrieval_confidence, 3),
-            reasons=["degraded: Bedrock unavailable, retrieval-only draft, forced escalate"],
-        )
-        logger.warning("gate forced escalate: degraded mode")
-    else:
-        route = decide_route(
-            triage_confidence=triage.confidence,
-            retrieval_confidence=round(retrieval_confidence, 3),
-            has_citations=bool(draft.citations),
-            body_chars=len(ticket.body),
-        )
+    route = decide_route(
+        triage_confidence=triage.confidence,
+        retrieval_confidence=round(retrieval_confidence, 3),
+        has_citations=bool(draft.citations),
+        body_chars=len(ticket.body),
+        degraded=draft_degraded,
+    )
     timings["draft_and_gate"] = round((time.perf_counter() - t0) * 1000, 2)
 
     return FirstResponse(
@@ -175,11 +185,13 @@ def handle_ticket(
                 "title": i.title,
                 "score": round(i.score, 4),
                 "url": i.url,
+                "text": i.text[:DRAFT_TEXT_CHARS],
             }
             for i in items
         ],
         draft=draft,
         route=route,
         degraded=degraded,
+        degrade_reasons=degrade_reasons,
         timings_ms=timings,
     )

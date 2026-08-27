@@ -27,7 +27,8 @@ class RetrievedItem:
     key: str
     title: str
     context: str  # docs: section trail; tickets: SIG labels
-    snippet: str
+    text: str  # FULL retrieved content; drafting and judging consume this
+    snippet: str  # short display cut of text, never used for drafting
     url: str | None
     score: float
     ranks: dict[str, int]  # list name -> 1-based rank, for observability
@@ -54,7 +55,7 @@ def rrf_merge(
 
 def _docs_vector(cur: psycopg.Cursor, qvec: list[float], k: int) -> list[tuple[str, dict]]:
     cur.execute(
-        "SELECT c.id, p.path, p.title, c.section, left(c.text, 200)"
+        "SELECT c.id, p.path, p.title, c.section, c.text"
         " FROM chunks c JOIN pages p ON p.id = c.page_id"
         " ORDER BY c.embedding <=> %s::vector LIMIT %s",
         (qvec, k),
@@ -66,7 +67,8 @@ def _docs_vector(cur: psycopg.Cursor, qvec: list[float], k: int) -> list[tuple[s
                 "corpus": "docs",
                 "title": row[2],
                 "context": row[3],
-                "snippet": row[4],
+                "text": row[4],
+                "snippet": row[4][:200],
                 "url": row[1],
             },
         )
@@ -76,7 +78,7 @@ def _docs_vector(cur: psycopg.Cursor, qvec: list[float], k: int) -> list[tuple[s
 
 def _docs_fts(cur: psycopg.Cursor, query: str, k: int) -> list[tuple[str, dict]]:
     cur.execute(
-        "SELECT c.id, p.path, p.title, c.section, left(c.text, 200)"
+        "SELECT c.id, p.path, p.title, c.section, c.text"
         " FROM chunks c JOIN pages p ON p.id = c.page_id,"
         " websearch_to_tsquery('english', %s) q"
         " WHERE c.tsv @@ q ORDER BY ts_rank_cd(c.tsv, q) DESC, c.id LIMIT %s",
@@ -89,7 +91,8 @@ def _docs_fts(cur: psycopg.Cursor, query: str, k: int) -> list[tuple[str, dict]]
                 "corpus": "docs",
                 "title": row[2],
                 "context": row[3],
-                "snippet": row[4],
+                "text": row[4],
+                "snippet": row[4][:200],
                 "url": row[1],
             },
         )
@@ -113,7 +116,7 @@ def _tickets_vector(
 ) -> list[tuple[str, dict]]:
     where, params = _ticket_filters(tenant_id, enabled)
     cur.execute(
-        f"SELECT number, title, array_to_string(sigs, ','), left(embed_text, 200), url"
+        f"SELECT number, title, array_to_string(sigs, ','), embed_text, url"
         f" FROM tickets WHERE {where} ORDER BY embedding <=> %s::vector LIMIT %s",
         (*params, qvec, k),
     )
@@ -124,7 +127,8 @@ def _tickets_vector(
                 "corpus": "tickets",
                 "title": row[1],
                 "context": row[2],
-                "snippet": row[3],
+                "text": row[3],
+                "snippet": row[3][:200],
                 "url": row[4],
             },
         )
@@ -137,7 +141,7 @@ def _tickets_fts(
 ) -> list[tuple[str, dict]]:
     where, params = _ticket_filters(tenant_id, enabled)
     cur.execute(
-        f"SELECT number, title, array_to_string(sigs, ','), left(embed_text, 200), url"
+        f"SELECT number, title, array_to_string(sigs, ','), embed_text, url"
         f" FROM tickets, websearch_to_tsquery('english', %s) q"
         f" WHERE {where} AND tsv @@ q ORDER BY ts_rank_cd(tsv, q) DESC, number LIMIT %s",
         (query, *params, k),
@@ -149,7 +153,8 @@ def _tickets_fts(
                 "corpus": "tickets",
                 "title": row[1],
                 "context": row[2],
-                "snippet": row[3],
+                "text": row[3],
+                "snippet": row[3][:200],
                 "url": row[4],
             },
         )

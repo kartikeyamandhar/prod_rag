@@ -13,6 +13,7 @@ import datetime as dt
 import json
 import logging
 import os
+import time
 from pathlib import Path
 
 import psycopg
@@ -46,6 +47,7 @@ def main() -> None:
             ]
 
         for row in rows:
+            time.sleep(float(os.environ.get("PROBE_PACING_S", "8")))
             ticket = TicketIn(
                 title=row["title"], body=row["body"][:4000], tenant_id=row["tenant_id"]
             )
@@ -62,6 +64,7 @@ def main() -> None:
                     "route": response.route.route,
                     "confidence": response.route.confidence,
                     "degraded": response.degraded,
+                    "degrade_reasons": response.degrade_reasons,
                     "n_citations": len(response.draft.citations),
                     "judge": scores,
                 }
@@ -70,6 +73,7 @@ def main() -> None:
                 f"#{row['number']} triage={response.triage.component}"
                 f" hit={response.triage.component in row['sigs']}"
                 f" route={response.route.route}({response.route.confidence:.2f})"
+                f" degrade={response.degrade_reasons or 'none'}"
                 f" judge={scores['grounding']}/{scores['cause_plausibility']}"
                 f"/{scores['actionability']}"
             )

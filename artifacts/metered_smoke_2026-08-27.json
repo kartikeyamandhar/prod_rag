@@ -1,0 +1,124 @@
+{
+ "date": "2026-08-27",
+ "model_id": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+ "n_tickets": 5,
+ "results": [
+  {
+   "ticket": 139028,
+   "truth_sigs": [
+    "sig/scheduling"
+   ],
+   "llm_triage": "sig/scheduling",
+   "triage_hit": true,
+   "severity": "medium",
+   "route": "auto_attach",
+   "confidence": 0.725,
+   "degraded": false,
+   "degrade_reasons": [],
+   "n_citations": 1,
+   "judge": {
+    "grounding": 1,
+    "cause_plausibility": 1,
+    "actionability": 2,
+    "rationale": "The drafted response cites a generic scheduler documentation snippet ('docs:828') that is irrelevant to the specific technical issue about AssumePod method not updating affinity and PVC count fields in the snapshot. The probable_cause explicitly states 'we cannot ground a diagnosis' rather than engaging with the concrete code references provided in the ticket (the snapshot.go file links). The cause_plausibility is fundamentally wrong: the ticket clearly identifies the root cause (AssumePod not modifying snapshot fields), but the response treats it as undiagnosed. The clarifying_questions are generic and miss the core issue\u2014the ticket already specifies the problem location and mechanism; what's needed is a fix to the AssumePod implementation, not more information gathering."
+   }
+  },
+  {
+   "ticket": 137797,
+   "truth_sigs": [
+    "sig/storage"
+   ],
+   "llm_triage": "sig/storage",
+   "triage_hit": true,
+   "severity": "high",
+   "route": "escalate",
+   "confidence": 0.74,
+   "degraded": true,
+   "degrade_reasons": [
+    "draft: ValueError: draft output failed validation twice; last: draft has no valid citations"
+   ],
+   "n_citations": 5,
+   "judge": {
+    "grounding": 1,
+    "cause_plausibility": 1,
+    "actionability": 1,
+    "rationale": "The drafted response cites an entirely unrelated ticket (126951) about nfacct client initialization failures in the proxy metrics module, which has no connection to the NFS CSI driver path traversal vulnerability described in the ticket. The suggested_fix references generic CSI migration documentation that does not address the specific path traversal validation issue or the subDir parameter vulnerability. The citations are fabricated or decorative\u2014none support the actual security issue (path traversal in subDir validation), and the probable_cause contradicts the ticket's clear description of the vulnerability mechanism."
+   }
+  },
+  {
+   "ticket": 135425,
+   "truth_sigs": [
+    "sig/network"
+   ],
+   "llm_triage": "sig/network",
+   "triage_hit": true,
+   "severity": "medium",
+   "route": "escalate",
+   "confidence": 0.71,
+   "degraded": true,
+   "degrade_reasons": [
+    "draft: ValueError: draft output failed validation twice; last: draft has no valid citations"
+   ],
+   "n_citations": 5,
+   "judge": {
+    "grounding": 1,
+    "cause_plausibility": 1,
+    "actionability": 1,
+    "rationale": "The drafted response is entirely disconnected from the ticket. The ticket clearly describes an incomplete feature gate implementation for RelaxedServiceNameValidation that fails to validate spec.defaultBackend.service.name, but the response cites an unrelated service allocator panic issue and recommends enabling UnknownVersionInteroperabilityProxy\u2014a completely different feature gate with no connection to Ingress service name validation. The citations reference Mixed Version Proxy and generic Ingress documentation rather than the actual validation code at pkg/apis/networking/validation/validation.go. This response would send the customer down a harmful path entirely orthogonal to their actual problem."
+   }
+  },
+  {
+   "ticket": 133474,
+   "truth_sigs": [
+    "sig/network"
+   ],
+   "llm_triage": "sig/network",
+   "triage_hit": true,
+   "severity": "medium",
+   "route": "auto_attach",
+   "confidence": 0.675,
+   "degraded": false,
+   "degrade_reasons": [],
+   "n_citations": 2,
+   "judge": {
+    "grounding": 2,
+    "cause_plausibility": 1,
+    "actionability": 3,
+    "rationale": "The draft admits upfront that the provided context does not explain the observed EndpointSlice churn pattern, making the citations decorative rather than substantive. The probable_cause is vague and non-committal, failing to ground in the ticket's specific observation that churn occurs when endpoints exceed 100 per slice during stable VM states. The real resolution (PR #136502) addresses a specific EndpointSlice allocation bug, but this draft provides only generic diagnostic questions rather than identifying the actual mechanism. The suggested_fix requests reasonable logs and configuration details, but lacks the ticket-specific insight needed to guide the customer toward the root cause."
+   }
+  },
+  {
+   "ticket": 132719,
+   "truth_sigs": [
+    "sig/network"
+   ],
+   "llm_triage": "sig/network",
+   "triage_hit": true,
+   "severity": "medium",
+   "route": "auto_attach",
+   "confidence": 0.71,
+   "degraded": false,
+   "degrade_reasons": [],
+   "n_citations": 1,
+   "judge": {
+    "grounding": 1,
+    "cause_plausibility": 2,
+    "actionability": 2,
+    "rationale": "The citation is truncated and irrelevant\u2014it only states kube-proxy 'proxies UDP, TCP and SCTP' without addressing ipset CIDR validation or zero-masked CIDR handling. The probable_cause admits the context lacks information about the actual issue, making it a non-grounded response. The cause_plausibility is low because the response does not identify the real mechanism (kube-proxy's ipset rule generation logic failing to filter or validate zero-masked CIDRs before passing them to ipset), instead vaguely pointing to 'ipset CIDR validation' without specifics. The actionability is weak\u2014suggesting a workaround (use specific CIDRs) and escalation are generic; the response lacks ticket-specific diagnostics or the concrete fix that the PR likely implemented (filtering/rejecting zero-masked CIDRs in kube-proxy code)."
+   }
+  }
+ ],
+ "pipeline_usage": {
+  "calls": 12,
+  "input_tokens": 30465,
+  "output_tokens": 2626,
+  "usd_at_list_rates": 0.0436
+ },
+ "judge_usage": {
+  "calls": 5,
+  "input_tokens": 7172,
+  "output_tokens": 986,
+  "usd_at_list_rates": 0.0121
+ },
+ "total_usd_at_list_rates": 0.0557
+}
