@@ -60,15 +60,18 @@ def run_meta(conn: psycopg.Connection | None = None) -> dict:
     git_sha = subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, capture_output=True, text=True, check=True
     ).stdout.strip()
-    dirty = bool(
-        subprocess.run(
-            ["git", "status", "--porcelain"],
-            cwd=REPO_ROOT,
-            capture_output=True,
-            text=True,
-            check=True,
-        ).stdout.strip()
-    )
+    # Dirty = CODE differs from HEAD. Files under artifacts/ are excluded:
+    # a sequential measurement pass necessarily dirties artifacts/ with each
+    # probe's own output, and flagging that would mark every pass after the
+    # first probe as tainted (observed on the first canonical run).
+    status_lines = subprocess.run(
+        ["git", "status", "--porcelain"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.splitlines()
+    dirty = any(not line[3:].startswith("artifacts/") for line in status_lines)
     meta = {
         "git_sha": git_sha,
         "git_dirty": dirty,
