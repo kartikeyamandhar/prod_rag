@@ -185,6 +185,18 @@ xychart-beta
 
 An earlier version of this table reported $0.0395 with "2 validation retries" and a call ledger that did not reconcile (104 expected vs 100 recorded): the unmetered gap was botocore's hidden internal retries, which also sat inside the admission-control semaphore. Internal retries are now disabled (max_attempts=1) and the failure taxonomy is explicit, so every Bedrock attempt is one metered call.
 
+### Held-out evaluation: the quality tier, measured (JUDGE-ONLY)
+
+All 47 held-out tickets through the live pipeline ([artifacts/held_out_eval.json](artifacts/held_out_eval.json), $0.47 metered, 0/47 degraded):
+
+| Metric | Value | Labeling |
+|---|---|---|
+| Triage accuracy | **44 of 47 (93.6%)** | proxy vs real maintainer SIG labels; no judge involved |
+| Gate routes | 43 request-info, 4 auto-attach, 0 escalate | the drafts themselves report context_sufficiency 1 on 35, 2 on 8, 3 on 4 tickets: for most real bugs the concepts docs genuinely cannot contain the resolution, and the system now says so instead of attaching uncited advice |
+| Draft grounding | median 5 (29 fives, 17 at 1-2) | JUDGE-ONLY: same-family judge, real closing-PR ground truth, cited spans in-prompt; human agreement pass waived 2026-08-27, no kappa claimed |
+| Cause plausibility | median 4, **bimodal: 21 ones vs 20 fives** | the judge separates drafts whose hypothesis matches the actual merged fix from those that miss; JUDGE-ONLY |
+| Actionability | median 3 (20 twos, 19 fours) | JUDGE-ONLY |
+
 ### Retrieval findings already on the record
 
 - **Found, then fixed: FTS contributed zero results for every real query.** `websearch_to_tsquery` ANDs a ticket-length query into nothing; measured on the 15-query replay set, both FTS lists were empty 15/15, which also made RRF fusion inert (identical scores, lexicographic tie-break, docs always first). The fix OR-ifies title terms plus a lexical payload mined from the body (backticked terms, `--flags`, CamelCase, dotted.paths, quoted errors), pre-registered gates, A/B on the same DB state ([artifacts/r2_fts_ab.json](artifacts/r2_fts_ab.json)): docs-FTS non-empty 0/15 -> 15/15, multi-list membership in the top 8 0% -> 70%, docs-always-first 15/15 -> 1/15, MRR of the first same-SIG ticket **0.383 -> 0.787**, same-SIG@8 13 -> 14, docs-domain@8 10 -> 12 of 15.
@@ -259,7 +271,7 @@ Two tiers, so evaluation cost stays sane:
 | Retrieval-tier (no LLM) | corpus counts, filter binding, latency, staleness/orphan probes | continuously, free |
 | LLM-tier | triage vs real labels, drafted responses judged against a **pinned rubric** ([probes/rubric.md](probes/rubric.md)), fix-hit vs real closing PRs | held-out slice + sampled schedules, metered |
 
-Hard rules: stub outputs never produce published quality numbers; **no judged number is published before a 30-ticket human spot-check of judge agreement** (deterministic sample: [artifacts/spot_check_sampling_sheet.csv](artifacts/spot_check_sampling_sheet.csv)). Agreement is reported as **Cohen's kappa on 3 collapsed bins (1-2 / 3 / 4-5) with a bootstrap CI** ([probes/judge_agreement.py](probes/judge_agreement.py)), never raw agreement (raw percent agreement overstates by 30-40 points on skewed score distributions); the acceptance bar is kappa > 0.6. The agreement population is restricted to non-degraded LLM drafts, and the fill aborts if more than 3 of 30 drafts degrade (an earlier sheet silently mixed 14 extractive fallbacks into the judged set). Judge inputs are the ticket, the draft, the exact context spans the drafter cited, and the real closing PR's title and body; an earlier judge received only a PR URL it could not open, and its floor-pinned scores were partly parse artifacts of a clamp that turned missing fields into 1s (the parser now raises instead).
+Hard rules: stub outputs never produce published quality numbers. The original rule "no judged number before a 30-ticket human spot-check of judge agreement" was **waived by the project owner on 2026-08-27**: every judged number below is therefore labeled JUDGE-ONLY, no human-agreement kappa is claimed, and the deterministic sheet plus [probes/judge_agreement.py](probes/judge_agreement.py) remain ready should a human pass happen later ([artifacts/spot_check_sampling_sheet.csv](artifacts/spot_check_sampling_sheet.csv)). Agreement is reported as **Cohen's kappa on 3 collapsed bins (1-2 / 3 / 4-5) with a bootstrap CI** ([probes/judge_agreement.py](probes/judge_agreement.py)), never raw agreement (raw percent agreement overstates by 30-40 points on skewed score distributions); the acceptance bar is kappa > 0.6. The agreement population is restricted to non-degraded LLM drafts, and the fill aborts if more than 3 of 30 drafts degrade (an earlier sheet silently mixed 14 extractive fallbacks into the judged set). Judge inputs are the ticket, the draft, the exact context spans the drafter cited, and the real closing PR's title and body; an earlier judge received only a PR URL it could not open, and its floor-pinned scores were partly parse artifacts of a clamp that turned missing fields into 1s (the parser now raises instead).
 
 Disclosed limitation: the judge is the same model family as the drafter (Haiku 4.5 judging Haiku 4.5), a documented self-preference bias risk. Mitigations here are the pinned rubric, real-PR ground truth, strict parsing, and the human spot-check gate; a cross-family judge is the correct next step if judged numbers ever carry more weight than a teaching series needs.
 

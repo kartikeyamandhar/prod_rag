@@ -6,7 +6,7 @@ This produces the quality-tier headline table. Labeling is strict about what
 each number is: triage accuracy is a PROXY metric against maintainer labels
 (no judge involved); draft-quality scores are JUDGE-ONLY (rubric-anchored
 Haiku judging Haiku drafts, real PR ground truth, cited spans in-prompt). The
-30-ticket human agreement pass was waived by the project owner on 2026-08-28;
+30-ticket human agreement pass was waived by the project owner on 2026-08-27;
 that waiver is recorded here and disclosed wherever these numbers appear.
 Aborts if more than 5 drafts degrade (health gate, audit B1's lesson).
 
@@ -129,7 +129,7 @@ def main() -> None:
             "actionability": dim("actionability"),
             "labeling": "JUDGE-ONLY: rubric-anchored same-family judge with real"
             " closing-PR ground truth and cited spans; the 30-ticket human"
-            " agreement pass was waived by the project owner (2026-08-28) and"
+            " agreement pass was waived by the project owner (2026-08-27) and"
             " no kappa is claimed",
         },
         "judged_rows": judged,

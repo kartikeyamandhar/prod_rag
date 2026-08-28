@@ -1,0 +1,414 @@
+{
+ "population": "all held-out tickets (replayed incoming)",
+ "n": 47,
+ "triage_accuracy_vs_real_sig_labels": {
+  "hits": 44,
+  "rate": 0.936,
+  "labeling": "proxy metric vs maintainer labels; no judge involved"
+ },
+ "routes": {
+  "request_info": 43,
+  "auto_attach": 4
+ },
+ "context_sufficiency_distribution": {
+  "1": 35,
+  "2": 8,
+  "3": 4
+ },
+ "degraded": 0,
+ "judged_n": 47,
+ "judge_only_draft_quality": {
+  "grounding": {
+   "median": 5.0,
+   "distribution": {
+    "1": 5,
+    "2": 12,
+    "4": 1,
+    "5": 29
+   }
+  },
+  "cause_plausibility": {
+   "median": 4.0,
+   "distribution": {
+    "1": 21,
+    "2": 2,
+    "4": 4,
+    "5": 20
+   }
+  },
+  "actionability": {
+   "median": 3.0,
+   "distribution": {
+    "1": 2,
+    "2": 20,
+    "3": 5,
+    "4": 19,
+    "5": 1
+   }
+  },
+  "labeling": "JUDGE-ONLY: rubric-anchored same-family judge with real closing-PR ground truth and cited spans; the 30-ticket human agreement pass was waived by the project owner (2026-08-27) and no kappa is claimed"
+ },
+ "judged_rows": [
+  {
+   "ticket": 107372,
+   "grounding": 5,
+   "cause_plausibility": 5,
+   "actionability": 5,
+   "rationale": "The draft correctly identifies that it lacks sufficient context to diagnose the issue and explicitly states this (context_sufficiency: 1). Rather than fabricating citations or unsupported claims, it honestly requests the specific context needed: issue #107191 (the referenced similar problem), documentation on QueueBroadcaster/EventWatcher cleanup patterns, and examples of existing fixes. The clarifying questions are directly ticket-relevant and would enable proper diagnosis. The actual PR confirms the issue was indeed goroutine leaks in sig-network tests requiring proper cleanup\u2014exactly what the draft's questions target. This response demonstrates appropriate epistemic humility and actionable next steps rather than speculative diagnosis."
+  },
+  {
+   "ticket": 107405,
+   "grounding": 2,
+   "cause_plausibility": 4,
+   "actionability": 2,
+   "rationale": "The draft cites only the finalizers documentation, which is tangentially relevant to understanding PV deletion mechanics but does not ground the probable_cause in Azure-specific code or the actual bug mechanism. The probable_cause correctly identifies that the issue stems from GET failing with 404 before DELETE is attempted (matching the PR's fix of handling non-existent disks), but the citation to finalizers docs is decorative rather than supporting this diagnosis. The suggested_fix requests appropriate context (Azure cloud provider code, PR #102083 details, error handling logic) but is generic troubleshooting rather than actionable next steps; the clarifying questions are reasonable but don't advance resolution without access to the actual codebase."
+  },
+  {
+   "ticket": 107886,
+   "grounding": 5,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft correctly acknowledges that provided context is insufficient (grounding: 5, no false citations). However, the probable_cause is fundamentally wrong: the actual resolution shows the bug is that Kubelet *should not attempt* CSI attach/detach when enable-controller-attach-detach=false, but the code was trying anyway, causing the nil pointer panic. The draft frames this as a diagnostic mystery rather than identifying the root cause (wrong subsystem logic). The clarifying questions are generic troubleshooting steps that would not advance resolution toward the actual fix: adding a validation check to prevent the unsupported operation."
+  },
+  {
+   "ticket": 107927,
+   "grounding": 5,
+   "cause_plausibility": 5,
+   "actionability": 4,
+   "rationale": "The draft correctly identifies that the provided context is insufficient and explicitly states this (context_sufficiency: 1), which is accurate\u2014no citations are provided because the context spans do not contain relevant EndpointSlice controller information. The probable_cause accurately reflects the ticket's core issue: EndpointSlice controller failures when Nodes referenced by pods are missing from the informer cache, matching the actual PR resolution which addresses exactly this scenario. The suggested_fix appropriately requests the necessary context (controller source code, Node informer behavior, error handling patterns) that would be needed to provide a grounded response. The clarifying_questions are relevant and would help diagnose the issue, though they are somewhat generic; a more specific question about whether PublishNotReadyAddresses is enabled on the affected Service would have been more actionable given the actual resolution."
+  },
+  {
+   "ticket": 108579,
+   "grounding": 5,
+   "cause_plausibility": 2,
+   "actionability": 4,
+   "rationale": "The draft correctly acknowledges lack of context and makes no unsupported claims, earning full grounding marks. However, cause_plausibility is low because the draft frames this as a diagnostic puzzle requiring more information, when the actual resolution shows the root cause is simply that kernel module checking should be removed entirely for statically-linked kernels\u2014not a code path confusion issue. The actionability is solid: requesting specific code sections, error messages, and version information would normally advance diagnosis, but these questions miss the actual fix direction (removing the module check rather than debugging it)."
+  },
+  {
+   "ticket": 110357,
+   "grounding": 2,
+   "cause_plausibility": 5,
+   "actionability": 2,
+   "rationale": "The draft correctly identifies that kubelet does not inject the 'domain' directive from resolv.conf, which matches the actual PR fix perfectly. However, the citations are weakly relevant\u2014the dnsConfig documentation describes *user-configurable* search domains, not the automatic inheritance mechanism that is the actual issue. The suggested_fix advises workarounds (manual dnsConfig, CoreDNS) rather than acknowledging this is a kubelet bug that needs fixing, making it misleading given the ticket is a legitimate bug report that was accepted and resolved by the maintainers."
+  },
+  {
+   "ticket": 111321,
+   "grounding": 5,
+   "cause_plausibility": 5,
+   "actionability": 4,
+   "rationale": "The draft correctly identifies that the provided context does not address the ticket's core issue (stale PodCIDR caching in LocalModeNodeCIDR mode), and this assessment is accurate\u2014no citations are claimed and none are fabricated. The probable_cause accurately reflects the ticket's description: kube-proxy caches stale Node.PodCIDR values when the Node object is recreated, causing incorrect local traffic routing. The clarifying questions directly target the root cause (watch/reconciliation logic, feature gates, version scope) and would advance diagnosis; requesting source code and design documentation is appropriate given the context gap, though the suggested_fix could be more specific about what code sections to examine."
+  },
+  {
+   "ticket": 111933,
+   "grounding": 5,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft correctly acknowledges that no context was provided and honestly states it cannot ground claims in citations (grounding: 5 for fidelity to lack of sources). However, the probable_cause actively contradicts the ticket's own root-cause analysis: the ticket explicitly identifies the mechanism (node-publish-path not being a mount point post-reboot, CSI driver unavailability during cleanup), yet the draft claims these issues are not addressed in context and requests information the ticket already provided. The cause_plausibility is 1 because the draft reframes the problem as unknown rather than engaging with the stated mechanism. Actionability scores 2: while the clarifying questions are reasonable in isolation, they are generic log-collection requests that ignore the ticket's already-detailed reproduction steps and known failure mode, missing the opportunity to guide toward the actual fix (handling cleanup when mount points don't exist or drivers are unavailable)."
+  },
+  {
+   "ticket": 112143,
+   "grounding": 2,
+   "cause_plausibility": 5,
+   "actionability": 3,
+   "rationale": "The draft correctly identifies the endpointSliceTracker mechanism and onEndpointSliceDelete handler as the root cause, matching the actual PR fix, but the citations provided (docs:69480) only cover general EndpointSlice mirroring behavior and do not support the specific claims about tracker state loss or the delete handler logic\u2014these claims are inferred from the ticket rather than grounded in the cited context. The probable_cause precisely matches the resolution (the PR fixes the tracker/delete handler interaction), making it highly plausible. The suggested_fix appropriately directs investigation toward the controller implementation and logs, though it stops short of the concrete code-level diagnosis that the actual PR provides."
+  },
+  {
+   "ticket": 112171,
+   "grounding": 2,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft cites only generic documentation about privileged containers (docs:69286) without engaging the ticket's specific technical problem: kube-proxy's concrete sysctls and capability requirements. The probable_cause misses the actual resolution entirely\u2014the PR introduces an `--init-only` flag to separate privileged initialization from runtime, not documentation of minimum privileges. The suggested_fix requests documentation and testing, but the real resolution already provides a working pattern (initContainer + specific capabilities like NET_ADMIN, SYS_RESOURCE), making the draft's recommendations misaligned with what the maintainers actually implemented."
+  },
+  {
+   "ticket": 113139,
+   "grounding": 5,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft correctly acknowledges that the provided context does not address the StatefulSet PVC recreation issue, so it makes no unsupported claims (grounding: 5). However, the probable_cause is fundamentally wrong: the draft frames this as a diagnostic mystery requiring logs, when the ticket and PR clearly identify the root cause as a StatefulSet controller bug that fails to recreate PVCs when pods are deleted before their PVCs (cause_plausibility: 1). The clarifying questions about finalizers and manual PVC recreation are generic troubleshooting steps that miss the actual mechanism\u2014the StatefulSet controller needs to be fixed to watch for and recreate missing PVCs for pending pods, not the user's environment (actionability: 2)."
+  },
+  {
+   "ticket": 114115,
+   "grounding": 4,
+   "cause_plausibility": 5,
+   "actionability": 4,
+   "rationale": "The draft correctly cites the documented behavior that the StatefulSet controller must set owner references on PVCs during scale-down (docs:70236), and accurately identifies that OwnerReferencesPermissionEnforcement blocks this operation. The probable_cause directly matches the PR resolution: the admission plugin enforces delete permissions before allowing owner reference updates. The suggested_fix is sound (verify RBAC delete permissions on PVCs) and would advance diagnosis, though the actual fix required RBAC changes to the controller's service account itself rather than user configuration\u2014a minor gap in specificity that doesn't mislead."
+  },
+  {
+   "ticket": 114815,
+   "grounding": 2,
+   "cause_plausibility": 1,
+   "actionability": 3,
+   "rationale": "The draft cites documentation about --nodeport-addresses but this is only tangentially related to the actual bug (a regression in ipvs mode where node addresses used as loadBalancerIPs are incorrectly excluded from NodePort binding). The probable_cause incorrectly frames this as a configuration/documentation issue rather than identifying the actual mechanism: PR #101429's netlink fix caused addresses on kube-ipvs0 to be excluded from NodePort, and when a loadBalancerIP is also a node address, it gets assigned to kube-ipvs0 and thus excluded. The clarifying questions are generic and miss the core issue; however, requesting kube-proxy logs and mode comparison does provide some actionable diagnostic value."
+  },
+  {
+   "ticket": 114996,
+   "grounding": 5,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft correctly identifies that it lacks sufficient context and honestly states context_sufficiency as 1, with no fabricated citations\u2014this is grounded honesty rather than false claims. However, the probable_cause is fundamentally wrong: the draft claims the context doesn't address VolumeZone or CSI migration, but the ticket itself explicitly describes the problem (VolumeZone plugin lacks CSI migration handling) and proposes the solution (detect migrated volumes and skip VolumeZone processing). The actual PR resolution translates beta topology labels to GA labels within the VolumeZone plugin itself, not by skipping it. The draft's request for context is reasonable but misses that the ticket body already contains the diagnosis; the actionability is low because requesting more context rather than engaging with the ticket's own problem statement delays resolution."
+  },
+  {
+   "ticket": 115044,
+   "grounding": 2,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft cites generic CSI documentation (docs:69862, docs:69863) that confirm CSI exists as an out-of-tree plugin, but these citations do not support the specific probable_cause claim about ProbeExpandableVolumePlugins omitting CSI. The probable_cause misses the actual root issue: the ticket explicitly identifies that ProbeExpandableVolumePlugins does not call csi.ProbeVolumePlugins() while ProbeAttachableVolumePlugins does, and provides a GitHub link to the problematic code. The draft's suggested_fix requests generic diagnostics (version, logs, RPC implementation) rather than addressing the code-level bug the ticket already diagnosed. The actionability is low because the draft treats this as a configuration/driver issue when the real resolution was a code fix to add CSI to the expandable plugins list."
+  },
+  {
+   "ticket": 115294,
+   "grounding": 5,
+   "cause_plausibility": 1,
+   "actionability": 3,
+   "rationale": "The draft correctly acknowledges having no relevant context and makes no unsupported claims (grounding: 5). However, the probable_cause is fundamentally wrong: the actual resolution was promoting RecoverVolumeExpansionFailure to beta, which addresses a feature gate controlling volume expansion failure recovery\u2014not the NodeExpansionRequired flag behavior described in the ticket (cause_plausibility: 1). The clarifying questions are reasonable and ticket-specific (logs, versions, driver confirmation), but the suggested_fix of requesting CSI documentation is generic and doesn't advance toward the actual resolution mechanism (actionability: 3)."
+  },
+  {
+   "ticket": 115343,
+   "grounding": 5,
+   "cause_plausibility": 5,
+   "actionability": 4,
+   "rationale": "The draft honestly acknowledges lack of context (context_sufficiency: 1) and makes no unsupported claims\u2014all statements are qualified by the absence of provided context. The probable_cause correctly identifies the core issue: node_stage_path not being set during NodeExpandVolume when volumes skip unstaging, which directly matches the PR's fix ('Set node_stage_path whenever available'). The clarifying questions are highly relevant and would advance diagnosis (CSI NodeExpandVolume spec, staging lifecycle, driver implementations), though the suggested_fix appropriately defers to context gathering rather than guessing."
+  },
+  {
+   "ticket": 116710,
+   "grounding": 1,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft cites no context spans and makes no claims grounded in the ticket details, earning a 1 for grounding. The probable_cause explicitly states the provided context does not address the issue, which is self-defeating; the actual ticket clearly identifies the root cause (fmt.Errorf formatting unused error messages in csi-translation-lib line 160), but the draft ignores this and claims insufficient context. The cause_plausibility is 1 because the draft misses the actual mechanism entirely\u2014the real PR fixes this by returning only volume names instead of formatting entire volume objects in error messages. The actionability scores 2: while the clarifying questions are generic and somewhat reasonable (CSI drivers, version upgrades, correlation checks), they do not advance toward the actual fix, which requires code-level changes to eliminate wasteful error formatting, not cluster configuration investigation."
+  },
+  {
+   "ticket": 116831,
+   "grounding": 5,
+   "cause_plausibility": 5,
+   "actionability": 4,
+   "rationale": "The draft correctly identifies that the provided context spans are insufficient and do not address the processedPods memory leak issue, which is accurate\u2014no citations were provided and the draft appropriately acknowledges this gap. The probable_cause accurately reflects the ticket's description of the race condition between podWorker's asynchronous WaitForUnmount() calls and populator cleanup, matching the actual PR resolution which addresses cleanup of entries lacking pods marked for deletion. The suggested_fix and clarifying_questions are well-targeted to the specific subsystem (desired_state_of_world_populator, processedPods lifecycle, podWorker synchronization), though they request documentation rather than proposing concrete diagnostic steps, which slightly limits immediate actionability."
+  },
+  {
+   "ticket": 117745,
+   "grounding": 5,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft correctly cites its own lack of context (zero citations) and honestly acknowledges insufficient information to diagnose the issue. However, the actual resolution reveals the root cause was a CSI volume reconstruction bug during API server unavailability\u2014not hostPath accessibility or permissions as the draft suggests. The clarifying questions about directory existence and permissions are reasonable generic troubleshooting but miss the actual mechanism (CSI driver attachment-ability determination during reconstruction), sending the customer down an incorrect diagnostic path."
+  },
+  {
+   "ticket": 118151,
+   "grounding": 5,
+   "cause_plausibility": 5,
+   "actionability": 4,
+   "rationale": "The draft correctly identifies the loopvar sharing bug as the root cause, which matches the PR title and description exactly ('correct use of loop variables'). The probable_cause accurately describes the mechanism: loop variable captured by reference in a closure causing race conditions with -race flag, which is directly supported by the ticket's patch showing `expected := expected` as the fix. The suggested_fix appropriately acknowledges missing context and requests relevant documentation/patterns rather than guessing, though it could have been more direct about the standard Go idiom (shadowing the loop variable) being the solution."
+  },
+  {
+   "ticket": 119767,
+   "grounding": 1,
+   "cause_plausibility": 1,
+   "actionability": 1,
+   "rationale": "The draft provides no citations despite the ticket containing explicit GitHub links and code references that directly support the bug mechanism. The draft's 'probable_cause' section merely restates that context is missing rather than analyzing the ticket's own detailed explanation of the bug (pluginA Skip \u2192 pluginB Unschedulable \u2192 SkipFilterPlugins not injected \u2192 PostFilter fails). The suggested_fix requests documentation that already exists in the ticket itself, and the clarifying_questions ask for information the customer has already provided. This response fails to engage with the concrete technical details in the ticket and would not advance resolution."
+  },
+  {
+   "ticket": 120268,
+   "grounding": 5,
+   "cause_plausibility": 2,
+   "actionability": 4,
+   "rationale": "The draft cites no context but makes accurate claims about the ticket's stated problem (device state transitions from uncertain to unmounted during CSI driver restarts preventing NodeUnstageVolume dispatch), so grounding is high by default for unsupported claims that don't contradict available evidence. However, cause_plausibility is low because the draft identifies the symptom (state transitions) but the actual PR fix addresses a different mechanism: marking NodeStageVolume errors as transient when the CSI driver is missing, not the unmountDetachDevices logic described in the ticket. The actionability is strong because the clarifying questions (K8s version, CSI driver version, error messages, driver specificity) are directly relevant and would advance diagnosis, even though they don't align with the actual root cause the maintainers fixed."
+  },
+  {
+   "ticket": 120937,
+   "grounding": 2,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft cites headless Service documentation but those citations are decorative and don't support the actual diagnosis. The real resolution addresses a validation bug in the Service controller that failed to reject invalid clusterIP transitions, whereas the draft speculates about immutability without grounding that claim in the provided context. The clarifying questions are generic troubleshooting rather than actionable next steps, and the draft misses the core issue: the Service controller should have rejected the conversion attempt but didn't due to a code defect."
+  },
+  {
+   "ticket": 121294,
+   "grounding": 5,
+   "cause_plausibility": 4,
+   "actionability": 4,
+   "rationale": "The draft makes no unsupported claims\u2014it explicitly acknowledges the provided context is insufficient and does not cite anything, avoiding fabrication. The probable_cause correctly identifies that nested volume mounting under read-only emptyDir is the issue, which aligns with the PR's solution to 'create nested mount points in emptyDir volumes.' The clarifying questions are highly relevant (Kubernetes version, kubelet logs, testing other volume types) and would advance diagnosis; however, the draft misses that the root cause is likely that emptyDir lacks the infrastructure to create nested mount points, which the PR directly addresses as a feature gap rather than a bug."
+  },
+  {
+   "ticket": 121794,
+   "grounding": 5,
+   "cause_plausibility": 5,
+   "actionability": 4,
+   "rationale": "The draft cites no context but makes no unsupported claims\u2014it explicitly acknowledges context insufficiency and frames all statements as diagnostic questions rather than assertions. The probable_cause correctly identifies the core issue: test state retention between runs, which matches the actual PR's root cause (the metric assertion assuming a zero starting value). The suggested_fix and clarifying_questions are highly relevant and would directly lead to discovering the unreset metric state; the only minor gap is that the draft doesn't suggest checking metric initialization or teardown logic specifically, though the general state-retention framing covers this."
+  },
+  {
+   "ticket": 121942,
+   "grounding": 5,
+   "cause_plausibility": 5,
+   "actionability": 4,
+   "rationale": "The drafter correctly identified that the provided context was insufficient and explicitly stated this (context_sufficiency: 1), which is accurate\u2014no citations were provided. The probable_cause accurately describes the core mechanism from the ticket: a misconfigured advertise address (127.0.0.1) persisted to etcd before validation, blocking subsequent updates. This matches the actual PR resolution which adds validation to the master lease reconciler to prevent invalid addresses from being persisted. The suggested_fix requests clarifying information (K8s version, affected versions, workarounds, workflow details) that would legitimately advance diagnosis, though it stops short of the specific fix implemented (validating advertise-address on startup in the reconciler)."
+  },
+  {
+   "ticket": 122057,
+   "grounding": 2,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft cites general scheduler architecture (filtering/scoring steps and percentageOfNodesToScore threshold) but these citations are decorative and don't support the core claim about behavior when scoring plugins are absent. The probable_cause explicitly admits lack of specific information about the actual bug mechanism, contradicting the ticket's clear description. The suggested_fix asks clarifying questions rather than proposing concrete investigation steps aligned with the ticket's reproducible scenario (configure scheduler without scoring plugins). The actual resolution directly addresses stopping node evaluation when no scoring plugins exist\u2014a specific optimization the draft fails to identify or propose."
+  },
+  {
+   "ticket": 123119,
+   "grounding": 1,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft cites no context spans and explicitly states it cannot provide grounded analysis, which violates the grounding contract entirely. The probable_cause is a meta-statement about missing context rather than an actual diagnosis, and it contradicts the ticket's own clear explanation of the root cause (os.ReadDir not seeing devtmpfs mounts). The clarifying questions are reasonable but generic; only the version/driver question is ticket-specific, and the draft misses the actual resolution focus (state leakage handling and cleanup procedures) that the real PR addressed."
+  },
+  {
+   "ticket": 124749,
+   "grounding": 2,
+   "cause_plausibility": 5,
+   "actionability": 4,
+   "rationale": "The citations are weakly relevant: the quoted text about deletion timestamps and finalizers is generic Kubernetes behavior, not specific to VolumeAttachment or resourceVersion handling. The probable_cause correctly identifies the race condition between finalizer patches and deletion across multiple API servers, matching the PR's actual fix (adding resourceVersion to delete operations). The suggested_fix is actionable and points to the right mechanism (resourceVersion for optimistic concurrency), though it lacks concrete code pointers; the clarifying questions are relevant but the second one essentially asks the customer to diagnose what the PR already fixed."
+  },
+  {
+   "ticket": 125012,
+   "grounding": 5,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft correctly identifies that it lacks sufficient context and honestly states this (context_sufficiency: 1), avoiding fabricated citations\u2014this is grounded honesty rather than false confidence. However, the probable_cause fundamentally misdiagnoses the issue: the ticket title and PR title both indicate the root cause is SecurityContext with RunAsUser on Windows, not primarily a node selector problem in kubeadm health checks. The actual resolution (per PR title) addresses kubelet's handling of RunAsUser on Windows, not scheduling health checks to Linux nodes. The clarifying questions are reasonable but generic; they don't advance toward the actual fix (kubelet must skip chown operations on Windows when RunAsUser is set)."
+  },
+  {
+   "ticket": 125354,
+   "grounding": 2,
+   "cause_plausibility": 4,
+   "actionability": 3,
+   "rationale": "The draft cites docs:69480 but the quotes provided are incomplete and don't actually support the specific claim about garbage collector deletion or the controller's failure to detect Endpoints recreation. The probable_cause correctly identifies the endpointslicemirroring controller and the Endpoints recreation scenario, aligning well with the PR's focus on fixing controller behavior during restart. However, the suggested_fix mixes generic troubleshooting (check labels, logs, restart) with some relevant specifics (verify selectorless Service, check skip-mirror label), but lacks the actual diagnostic or code-level insight that would directly address the root cause of the controller's missed reconciliation event."
+  },
+  {
+   "ticket": 125467,
+   "grounding": 5,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft correctly identifies that it lacks sufficient context and makes no unsupported claims\u2014all statements about missing information are accurate (grounding: 5). However, the draft fundamentally misdiagnoses the problem: it frames this as a general conntrack management issue requiring diagnostic investigation, when the actual resolution shows this is a specific regression in kube-proxy's UDP endpoint deletion logic introduced in v1.29 (the `IsServing()` check was incorrectly removed in PR #119394). The draft's suggested_fix requests generic context about conntrack procedures rather than identifying the known regression, sending the customer toward investigation rather than the actual fix (cause_plausibility: 1). The clarifying questions about iptables vs IPVS mode and conntrack garbage collection are reasonable diagnostic steps but miss the core issue\u2014this is a code regression, not a configuration problem\u2014making the actionability marginally useful but ultimately misdirected (actionability: 2)."
+  },
+  {
+   "ticket": 126468,
+   "grounding": 5,
+   "cause_plausibility": 5,
+   "actionability": 4,
+   "rationale": "The draft correctly identifies that the provided context is insufficient and explicitly states this (context_sufficiency: 1), avoiding fabricated citations\u2014this is honest grounding. The probable_cause accurately describes the actual mechanism from the PR: a race condition where services are missing from svcPortMap during initialization, causing DNAT rules to be temporarily removed and conntrack cleanup to be skipped. The clarifying_questions directly target the root cause (initialization ordering, cache synchronization, conntrack deletion timing) that the actual PR fixes. The only minor gap is that the draft could have been more directive about the specific fix (waiting for informer caches to sync before setting isInitialized), but the questions would lead a maintainer to that solution."
+  },
+  {
+   "ticket": 126552,
+   "grounding": 5,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft correctly identifies that the provided context is insufficient and makes no unsupported claims\u2014all statements about missing context are accurate (grounding: 5). However, the draft fundamentally misdiagnoses the situation: the ticket itself IS the context needed, and the real resolution was to add progress tracking to kubelet logging for FSGroup operations, not to request additional documentation (cause_plausibility: 1). The clarifying questions about source code and design documents are reasonable but miss the actionable path forward: the drafter should have recognized the ticket as a feature request and suggested either prototyping progress-tracking logs or filing an enhancement proposal with the storage SIG (actionability: 2)."
+  },
+  {
+   "ticket": 126885,
+   "grounding": 1,
+   "cause_plausibility": 1,
+   "actionability": 1,
+   "rationale": "The draft provides no citations and explicitly states it cannot ground suggestions due to insufficient context. However, the ticket title 'e2e can't assert inside wait loops' and the actual PR resolution ('removes e2e assertions inside waitloops') are directly present in the ticket itself, making the claim of missing context factually incorrect. The draft's refusal to engage with the clearly stated problem and its speculative mention of 'defer GinkgoRecover()' (unsupported by any provided evidence) demonstrates both fabricated reasoning and failure to recognize the actual issue already articulated in the ticket."
+  },
+  {
+   "ticket": 126922,
+   "grounding": 5,
+   "cause_plausibility": 4,
+   "actionability": 4,
+   "rationale": "The draft cites no context but makes no unsupported claims\u2014it explicitly acknowledges insufficient information and requests specific diagnostic data. The probable_cause correctly identifies this as a regression in endpoint visibility filtering between versions, which aligns with the PR's focus on fixing unexpected endpoint behavior. The clarifying questions are highly actionable and ticket-specific: they isolate whether the issue is upstream vs. platform-specific, rule out custom controllers, and verify the discrepancy between `kubectl get endpoints` and `kubectl describe service` that the ticket itself highlights."
+  },
+  {
+   "ticket": 129825,
+   "grounding": 5,
+   "cause_plausibility": 5,
+   "actionability": 2,
+   "rationale": "The draft correctly identifies that the provided context is insufficient and accurately cites the absence of relevant CSI documentation or code comparisons. The probable_cause correctly diagnoses the problem: the draft recognizes the ticket itself contains the root cause (the conditional skip of NodeUnstageVolume when stagingPath doesn't exist in csi_block.go). However, the suggested_fix requests external documentation rather than proposing concrete diagnostic or remediation steps; while the clarifying questions are reasonable, they don't advance resolution since the ticket already provides the mechanism and justification for the fix."
+  },
+  {
+   "ticket": 129982,
+   "grounding": 5,
+   "cause_plausibility": 5,
+   "actionability": 4,
+   "rationale": "The draft correctly acknowledges that the provided context is insufficient and does not cite unsupported claims\u2014it explicitly states context_sufficiency is 1 and lists what is missing rather than fabricating citations. The probable_cause accurately identifies the core issue: conntrack cleanup triggered by UDP endpoint changes causing memory/CPU spikes in kube-proxy v1.32, which directly matches the PR resolution (a netlink library bump to fix conntrack memory handling). The clarifying questions are highly relevant and ticket-specific (logs, version regression testing, conntrack table size), though the suggested_fix requests information rather than proposing concrete diagnostic steps the customer can immediately execute."
+  },
+  {
+   "ticket": 131045,
+   "grounding": 5,
+   "cause_plausibility": 5,
+   "actionability": 4,
+   "rationale": "The draft correctly identifies that no context was provided and appropriately declines to fabricate citations, scoring perfect grounding. The probable_cause accurately reflects the ticket's core issue: a field name mismatch between validation code ('allocatedResourceStatus') and the struct definition ('AllocatedResourceStatuses'), which matches exactly what the closing PR fixed. The suggested_fix requests the PersistentVolumeClaimStatus struct definition and API documentation\u2014highly relevant diagnostic steps\u2014though it could have been more direct by suggesting a simple grep/code inspection of the struct definition as the immediate first step."
+  },
+  {
+   "ticket": 131381,
+   "grounding": 5,
+   "cause_plausibility": 5,
+   "actionability": 4,
+   "rationale": "The draft correctly identifies that the provided context is insufficient and does not address PVC volume expansion or NodeResizeError lifecycle\u2014this is accurate grounding. The probable_cause correctly recognizes the core issue: Kubernetes fails to clear NodeResizeError when a CSI driver lacks NodeExpandVolume support despite successful controller-side resize, which matches the actual PR fix addressing unsupported node expansion for RWX volumes. The clarifying questions are highly relevant (external-resizer logs, feature gate intent, version-specific behavior) and would advance diagnosis; the suggested_fix appropriately requests documentation on the expected condition lifecycle rather than proposing incorrect solutions."
+  },
+  {
+   "ticket": 131661,
+   "grounding": 5,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft correctly identifies that it lacks the necessary context to diagnose the issue and makes no unsupported claims (grounding: 5). However, the probable_cause essentially states 'I don't have enough information' rather than proposing any mechanism, which directly contradicts the actual resolution that identifies a specific bug in the backoff logic when PodMaxBackoffDuration is zero (cause_plausibility: 1). The clarifying questions are reasonable but generic; they don't advance toward the actual fix, which required understanding the Truncate(now) comparison logic in the backoff queue code already cited in the ticket (actionability: 2)."
+  },
+  {
+   "ticket": 132719,
+   "grounding": 5,
+   "cause_plausibility": 5,
+   "actionability": 4,
+   "rationale": "The draft correctly acknowledges lack of context and refuses to fabricate citations, which is the right call given no context was provided\u2014this demonstrates grounding integrity. The probable_cause accurately identifies the core issue: kube-proxy attempts to add zero-masked CIDRs to ipset, which ipset rejects, matching exactly what the closing PR fixes. The suggested_fix appropriately requests relevant context rather than guessing, and the clarifying_questions are well-targeted (kube-proxy source code, workarounds, version verification), though they could be more specific about requesting the actual kube-proxy code location where CIDR validation occurs."
+  },
+  {
+   "ticket": 133474,
+   "grounding": 2,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft cites terminating EndpointSlices (tickets:108779) and general distribution logic (docs:69477), but these citations are decorative and don't support the actual probable_cause. The real resolution addresses a specific hash mismatch bug where nil ports vs. empty slice ports cause continuous churn\u2014a mechanism entirely absent from the draft's explanation. The suggested_fix focuses on terminating slices and version checks, which would not address the port normalization bug that was actually fixed. The clarifying questions are generic and miss the core diagnostic (checking port field differences between computed and API-server slices)."
+  },
+  {
+   "ticket": 135425,
+   "grounding": 1,
+   "cause_plausibility": 1,
+   "actionability": 2,
+   "rationale": "The draft cites no context spans and explicitly states context_sufficiency is 1, claiming the provided context is unrelated. However, the ticket itself contains direct links to the relevant code (pkg/apis/networking/validation/validation.go#L701) and clearly describes the bug: allowRelaxedServiceNameValidation() checks spec.rules but not spec.defaultBackend.service.name. The draft's probable_cause contradicts the ticket's explicit problem statement rather than engaging with it. The clarifying questions are reasonable but the draft fails to recognize that the ticket already provides sufficient grounding for diagnosis\u2014the bug is clearly identified in the ticket body itself, making the response unhelpfully dismissive of actionable information already present."
+  },
+  {
+   "ticket": 137797,
+   "grounding": 5,
+   "cause_plausibility": 5,
+   "actionability": 4,
+   "rationale": "The draft correctly acknowledges that no supporting context was provided (citations: []), making all claims appropriately hedged and non-fabricated. The probable_cause accurately reflects the ticket's description of path traversal in subDir validation as the vulnerability mechanism. The clarifying questions are highly ticket-specific (version check, volumeHandle inspection, log review) and would concretely advance diagnosis, though the suggested_fix is somewhat generic in requesting documentation rather than proposing concrete mitigation steps already stated in the ticket."
+  },
+  {
+   "ticket": 139028,
+   "grounding": 2,
+   "cause_plausibility": 5,
+   "actionability": 3,
+   "rationale": "The draft correctly identifies the core bug (AssumePod not updating affinity/PVC fields) and cites the ticket's specific line references, but the citations to tickets:134393 and docs:68914 are decorative rather than supporting the probable_cause\u2014they discuss related but distinct affinity issues rather than the snapshot state-tracking problem. The probable_cause precisely matches the actual resolution (snapshot-wide indexes not maintained during assume/forget), earning full plausibility. Actionability is generic (verify fields, review code) with one relevant specific (check lines 50-57), but lacks the concrete fix direction that the PR provides (maintain havePodsWithAffinityNodeInfoList, havePodsWithRequiredAntiAffinityNodeInfoList, usedPVCSet)."
+  }
+ ],
+ "pipeline_usage": {
+  "calls": 94,
+  "input_tokens": 231571,
+  "output_tokens": 20800,
+  "usd_at_list_rates": 0.3356
+ },
+ "judge_usage": {
+  "calls": 47,
+  "input_tokens": 85938,
+  "output_tokens": 8927,
+  "usd_at_list_rates": 0.1306
+ },
+ "run_meta": {
+  "git_sha": "d9430fb48f9ded88e139fb53ada6c992322fde9c",
+  "git_dirty": false,
+  "env": {
+   "LLM_MAX_CONCURRENCY": null,
+   "LLM_ACQUIRE_TIMEOUT_S": null,
+   "DEGRADE_DISABLED": null,
+   "FAULT_INJECT_THROTTLE": null,
+   "PROBE_PACING_S": null,
+   "EMBED_MODEL_NAME": "BAAI/bge-small-en-v1.5",
+   "BEDROCK_MODEL_ID": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+  },
+  "run_ordinal": 13,
+  "db": {
+   "chunks": 2487,
+   "chunks_md5": "d552a182a397",
+   "tickets": 401,
+   "tickets_md5": "0f062f37c56f"
+  }
+ }
+}
