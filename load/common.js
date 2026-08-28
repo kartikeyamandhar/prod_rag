@@ -81,6 +81,7 @@ export function summaryFor(prefix) {
         api: API,
         expect_degraded: __ENV.EXPECT_DEGRADED || "unset",
         git_sha: __ENV.GIT_SHA || "unset",
+        box_env: __ENV.BOX_ENV || "unset", // the server-side admission/LLM config this arm ran under
         note_dropped_iterations: "load-generator artifact (VU pool exhausted), not a server failure",
         metrics: data.metrics,
         checks_root_group: data.root_group,
