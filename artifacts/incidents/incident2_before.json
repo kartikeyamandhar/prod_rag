@@ -58,9 +58,9 @@
    "ticket": 107372,
    "stale_docs_in_top8": 3,
    "keys": [
-    "docs:33282",
-    "docs:33283",
-    "docs:33028"
+    "docs:52130",
+    "docs:52131",
+    "docs:51876"
    ]
   },
   {
@@ -72,8 +72,8 @@
    "ticket": 107886,
    "stale_docs_in_top8": 2,
    "keys": [
-    "docs:34654",
-    "docs:34575"
+    "docs:53502",
+    "docs:53423"
    ]
   },
   {
@@ -100,14 +100,14 @@
    "ticket": 111933,
    "stale_docs_in_top8": 1,
    "keys": [
-    "docs:34654"
+    "docs:53502"
    ]
   },
   {
    "ticket": 112143,
    "stale_docs_in_top8": 1,
    "keys": [
-    "docs:34355"
+    "docs:53203"
    ]
   },
   {
@@ -124,159 +124,159 @@
    "ticket": 114115,
    "stale_docs_in_top8": 4,
    "keys": [
-    "docs:35026",
-    "docs:34992",
-    "docs:33000",
-    "docs:35027"
+    "docs:53874",
+    "docs:53840",
+    "docs:51848",
+    "docs:53875"
    ]
   },
   {
    "ticket": 114815,
    "stale_docs_in_top8": 4,
    "keys": [
-    "docs:34369",
-    "docs:34362",
-    "docs:34367",
-    "docs:34366"
+    "docs:53217",
+    "docs:53210",
+    "docs:53215",
+    "docs:53214"
    ]
   },
   {
    "ticket": 114996,
    "stale_docs_in_top8": 2,
    "keys": [
-    "docs:34659",
-    "docs:34654"
+    "docs:53507",
+    "docs:53502"
    ]
   },
   {
    "ticket": 115044,
    "stale_docs_in_top8": 4,
    "keys": [
-    "docs:34659",
-    "docs:34655",
-    "docs:34653",
-    "docs:34654"
+    "docs:53507",
+    "docs:53503",
+    "docs:53501",
+    "docs:53502"
    ]
   },
   {
    "ticket": 115294,
    "stale_docs_in_top8": 2,
    "keys": [
-    "docs:34655",
-    "docs:34659"
+    "docs:53503",
+    "docs:53507"
    ]
   },
   {
    "ticket": 115343,
    "stale_docs_in_top8": 2,
    "keys": [
-    "docs:34661",
-    "docs:34662"
+    "docs:53509",
+    "docs:53510"
    ]
   },
   {
    "ticket": 116710,
    "stale_docs_in_top8": 1,
    "keys": [
-    "docs:33258"
+    "docs:52106"
    ]
   },
   {
    "ticket": 116831,
    "stale_docs_in_top8": 2,
    "keys": [
-    "docs:33835",
-    "docs:33270"
+    "docs:52683",
+    "docs:52118"
    ]
   },
   {
    "ticket": 117745,
    "stale_docs_in_top8": 1,
    "keys": [
-    "docs:33808"
+    "docs:52656"
    ]
   },
   {
    "ticket": 118151,
    "stale_docs_in_top8": 4,
    "keys": [
-    "docs:34560",
-    "docs:33017",
-    "docs:34615",
-    "docs:34644"
+    "docs:53408",
+    "docs:51865",
+    "docs:53463",
+    "docs:53492"
    ]
   },
   {
    "ticket": 119767,
    "stale_docs_in_top8": 3,
    "keys": [
-    "docs:35196",
-    "docs:35198",
-    "docs:35195"
+    "docs:54044",
+    "docs:54046",
+    "docs:54043"
    ]
   },
   {
    "ticket": 120268,
    "stale_docs_in_top8": 4,
    "keys": [
-    "docs:34655",
-    "docs:34659",
-    "docs:35181",
-    "docs:34566"
+    "docs:53503",
+    "docs:53507",
+    "docs:54029",
+    "docs:53414"
    ]
   },
   {
    "ticket": 120937,
    "stale_docs_in_top8": 1,
    "keys": [
-    "docs:34380"
+    "docs:53228"
    ]
   },
   {
    "ticket": 121294,
    "stale_docs_in_top8": 2,
    "keys": [
-    "docs:34618",
-    "docs:34663"
+    "docs:53466",
+    "docs:53511"
    ]
   },
   {
    "ticket": 121794,
    "stale_docs_in_top8": 2,
    "keys": [
-    "docs:33283",
-    "docs:34369"
+    "docs:52131",
+    "docs:53217"
    ]
   },
   {
    "ticket": 121942,
    "stale_docs_in_top8": 1,
    "keys": [
-    "docs:34359"
+    "docs:53207"
    ]
   },
   {
    "ticket": 122057,
    "stale_docs_in_top8": 2,
    "keys": [
-    "docs:33906",
-    "docs:33902"
+    "docs:52754",
+    "docs:52750"
    ]
   },
   {
    "ticket": 123119,
    "stale_docs_in_top8": 1,
    "keys": [
-    "docs:33841"
+    "docs:52689"
    ]
   },
   {
    "ticket": 124749,
    "stale_docs_in_top8": 3,
    "keys": [
-    "docs:35025",
-    "docs:35027",
-    "docs:35228"
+    "docs:53873",
+    "docs:53875",
+    "docs:54076"
    ]
   },
   {
@@ -288,7 +288,7 @@
    "ticket": 125354,
    "stale_docs_in_top8": 1,
    "keys": [
-    "docs:34355"
+    "docs:53203"
    ]
   },
   {
@@ -305,15 +305,15 @@
    "ticket": 126552,
    "stale_docs_in_top8": 2,
    "keys": [
-    "docs:34527",
-    "docs:33438"
+    "docs:53375",
+    "docs:52286"
    ]
   },
   {
    "ticket": 126885,
    "stale_docs_in_top8": 1,
    "keys": [
-    "docs:34369"
+    "docs:53217"
    ]
   },
   {
@@ -325,48 +325,48 @@
    "ticket": 129825,
    "stale_docs_in_top8": 1,
    "keys": [
-    "docs:34659"
+    "docs:53507"
    ]
   },
   {
    "ticket": 129982,
    "stale_docs_in_top8": 4,
    "keys": [
-    "docs:33252",
-    "docs:33270",
-    "docs:33283",
-    "docs:35181"
+    "docs:52100",
+    "docs:52118",
+    "docs:52131",
+    "docs:54029"
    ]
   },
   {
    "ticket": 131045,
    "stale_docs_in_top8": 1,
    "keys": [
-    "docs:33449"
+    "docs:52297"
    ]
   },
   {
    "ticket": 131381,
    "stale_docs_in_top8": 1,
    "keys": [
-    "docs:34659"
+    "docs:53507"
    ]
   },
   {
    "ticket": 131661,
    "stale_docs_in_top8": 4,
    "keys": [
-    "docs:33802",
-    "docs:35208",
-    "docs:34899",
-    "docs:33803"
+    "docs:52650",
+    "docs:54056",
+    "docs:53747",
+    "docs:52651"
    ]
   },
   {
    "ticket": 132719,
    "stale_docs_in_top8": 1,
    "keys": [
-    "docs:34369"
+    "docs:53217"
    ]
   },
   {
@@ -378,15 +378,15 @@
    "ticket": 135425,
    "stale_docs_in_top8": 1,
    "keys": [
-    "docs:33449"
+    "docs:52297"
    ]
   },
   {
    "ticket": 137797,
    "stale_docs_in_top8": 2,
    "keys": [
-    "docs:34655",
-    "docs:34599"
+    "docs:53503",
+    "docs:53447"
    ]
   },
   {
@@ -396,7 +396,7 @@
   }
  ],
  "run_meta": {
-  "git_sha": "3b82fee534dba43ee48dea07d183e0a4024179a6",
+  "git_sha": "616dfef545b510ba74585a57531acef9ca4fe9bb",
   "git_dirty": false,
   "env": {
    "LLM_MAX_CONCURRENCY": null,
@@ -407,7 +407,7 @@
    "EMBED_MODEL_NAME": "BAAI/bge-small-en-v1.5",
    "BEDROCK_MODEL_ID": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
   },
-  "run_ordinal": 1,
+  "run_ordinal": 8,
   "db": {
    "chunks": 2487,
    "chunks_md5": "d552a182a397",

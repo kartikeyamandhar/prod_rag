@@ -224,13 +224,29 @@ xychart-beta
 
 The incident 7 null result is kept deliberately: the series is about measurement discipline, and "the obvious fix did not move the metric" is a finding, not a failure of the writeup. The audited v1 version of this null was invalid four separate ways (near-ceiling metric, two variables moved at once, 13 of 32 tickets invisible to the URL extractor, captions evicting body text from the embed window); the redesign fixed all four and the null survived, which is the stronger claim.
 
-**Pending re-measurement on the box** (v1 numbers retracted, kept in [artifacts/incidents/retired_v1/](artifacts/incidents/retired_v1/)):
+**Re-measured on the box, 2026-08-27** (v1 numbers retracted, kept with their defect descriptions in [artifacts/incidents/retired_v1/](artifacts/incidents/retired_v1/); every arm below records the server-side config it ran under):
 
-| # | Incident | Why the v1 number is retracted | Redo design (pre-registered) |
+| # | Incident | Before (failure) | After (v1 fix) |
 |---|---|---|---|
-| 1 | Ticket storm, LLM in request path | after-arm mixed 8 admission-degraded responses with 3 LLM responses under one "median 365ms"; before-arm p95 was the load tool's 30s cutoff, not a measurement; the deployed box never ran the measured admission config | outcome-class latencies (LLM vs degraded reported separately), gracefulStop 120s, per-arm degraded expectations asserted, env recorded in-artifact |
-| 4 | Reindex under load | window-ratio p95 presented as request p95; ~500x workload-size confound undisclosed; ran on the stub path unlabeled; the documented driver was not the one that ran | documented driver runs, stub label mandatory, headline = max read-block duration, workload sizes disclosed |
-| 6 | Provider throttle | "15 of 15 fail with 5xx" was really 10 5xx + 5 transport errors; before/after latencies measured different quantities under one name; p95 index math off at n=15 | 5xx vs transport split, time_to_error vs time_to_complete named honestly, correct percentiles, synthetic-injection flag in the artifact |
+| 1 | Ticket storm, LLM in request path (10 arrivals in 1s, Bedrock live) | no admission cap: **the provider throttles you** -- 2/10 LLM completions (median 5.9s), 8/10 chaotic provider-driven degrades (median 2.2s); the "expects no degraded" check failed 8 times and stays in the artifact | cap 3 + 0.25s acquire (cooled-down arm): 1/10 LLM, 9/10 **policy-chosen** degrades (median 1.5s, min 0.65s), 13 admission rejects metered by the live counters, 0 errors, everything answers 200 and force-escalates. Honest finding: admission control did *not* preserve LLM throughput here (a burst needing 20 LLM calls through 3 permits in ~1s cannot fit); it converted provider chaos into fast, deterministic, labeled degradation. The queue-with-deadline rung of the pre-registered ladder is the throughput fix and remains deliberately unbuilt |
+| 4 | Reindex under load (stub path, labeled; the documented driver is what ran) | naive full reload (2,487 chunks, one transaction) during a 101-request sustained+burst load: reads blocked up to **5,652ms** (p95 4,439ms; median untouched at 153ms), 0 errors, 0 dropped iterations | incremental replayer tick under identical load: worst read **318ms** (p95 209ms). The two reindex workloads differ ~500x in size *by design of the fix*; disclosed, not equalized |
+| 6 | Provider throttle (synthetic injection, flagged in-artifact) | no degrade path: 15/15 fail -- **10 HTTP 5xx + 5 transport errors**, the two classes v1 lumped together as "5xx"; time_to_error p50 77ms | degrade path: 15/15 return cited retrieval-only drafts, 15/15 force-escalated, time_to_complete p50 251ms / max 583ms. The two latency columns are different quantities and are never mixed |
+
+```mermaid
+xychart-beta
+    title "Incident 1: outcome classes per arm (10 requests in 1s)"
+    x-axis ["LLM (no cap)", "degraded (no cap)", "LLM (cap 3)", "degraded (cap 3)"]
+    y-axis "requests" 0 --> 10
+    bar [2, 8, 1, 9]
+```
+
+```mermaid
+xychart-beta
+    title "Incident 4: worst read block during reindex (ms)"
+    x-axis ["full reload (2,487 chunks)", "incremental tick"]
+    y-axis "worst read latency (ms)" 0 --> 6000
+    bar [5652, 318]
+```
 
 ---
 

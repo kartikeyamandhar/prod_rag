@@ -1,0 +1,213 @@
+{
+ "tag": "incident6_after",
+ "api": "http://34.213.225.151:8080",
+ "synthetic_injection": true,
+ "n": 15,
+ "outcomes": {
+  "completed": 15,
+  "completed_degraded": 15,
+  "http_5xx": 0,
+  "http_4xx": 0,
+  "transport_error": 0
+ },
+ "routes": {
+  "auto_attach": 0,
+  "escalate": 15,
+  "request_info": 0
+ },
+ "time_to_complete_ms": {
+  "n": 15,
+  "p50": 251.0,
+  "p95": null,
+  "p95_note": "n=15 < 20: p95 would just be the max; see max",
+  "max": 583
+ },
+ "time_to_error_ms": null,
+ "rows": [
+  {
+   "ticket": 139028,
+   "outcome": "completed",
+   "degraded": true,
+   "degrade_reasons": [
+    "triage: LLMUnavailable: FaultInjectedThrottle",
+    "draft: LLMUnavailable: FaultInjectedThrottle"
+   ],
+   "route": "escalate",
+   "time_to_complete_ms": 583
+  },
+  {
+   "ticket": 137797,
+   "outcome": "completed",
+   "degraded": true,
+   "degrade_reasons": [
+    "triage: LLMUnavailable: FaultInjectedThrottle",
+    "draft: LLMUnavailable: FaultInjectedThrottle"
+   ],
+   "route": "escalate",
+   "time_to_complete_ms": 332
+  },
+  {
+   "ticket": 135425,
+   "outcome": "completed",
+   "degraded": true,
+   "degrade_reasons": [
+    "triage: LLMUnavailable: FaultInjectedThrottle",
+    "draft: LLMUnavailable: FaultInjectedThrottle"
+   ],
+   "route": "escalate",
+   "time_to_complete_ms": 315
+  },
+  {
+   "ticket": 133474,
+   "outcome": "completed",
+   "degraded": true,
+   "degrade_reasons": [
+    "triage: LLMUnavailable: FaultInjectedThrottle",
+    "draft: LLMUnavailable: FaultInjectedThrottle"
+   ],
+   "route": "escalate",
+   "time_to_complete_ms": 267
+  },
+  {
+   "ticket": 132719,
+   "outcome": "completed",
+   "degraded": true,
+   "degrade_reasons": [
+    "triage: LLMUnavailable: FaultInjectedThrottle",
+    "draft: LLMUnavailable: FaultInjectedThrottle"
+   ],
+   "route": "escalate",
+   "time_to_complete_ms": 292
+  },
+  {
+   "ticket": 131661,
+   "outcome": "completed",
+   "degraded": true,
+   "degrade_reasons": [
+    "triage: LLMUnavailable: FaultInjectedThrottle",
+    "draft: LLMUnavailable: FaultInjectedThrottle"
+   ],
+   "route": "escalate",
+   "time_to_complete_ms": 251
+  },
+  {
+   "ticket": 131381,
+   "outcome": "completed",
+   "degraded": true,
+   "degrade_reasons": [
+    "triage: LLMUnavailable: FaultInjectedThrottle",
+    "draft: LLMUnavailable: FaultInjectedThrottle"
+   ],
+   "route": "escalate",
+   "time_to_complete_ms": 198
+  },
+  {
+   "ticket": 131045,
+   "outcome": "completed",
+   "degraded": true,
+   "degrade_reasons": [
+    "triage: LLMUnavailable: FaultInjectedThrottle",
+    "draft: LLMUnavailable: FaultInjectedThrottle"
+   ],
+   "route": "escalate",
+   "time_to_complete_ms": 201
+  },
+  {
+   "ticket": 129982,
+   "outcome": "completed",
+   "degraded": true,
+   "degrade_reasons": [
+    "triage: LLMUnavailable: FaultInjectedThrottle",
+    "draft: LLMUnavailable: FaultInjectedThrottle"
+   ],
+   "route": "escalate",
+   "time_to_complete_ms": 221
+  },
+  {
+   "ticket": 129825,
+   "outcome": "completed",
+   "degraded": true,
+   "degrade_reasons": [
+    "triage: LLMUnavailable: FaultInjectedThrottle",
+    "draft: LLMUnavailable: FaultInjectedThrottle"
+   ],
+   "route": "escalate",
+   "time_to_complete_ms": 262
+  },
+  {
+   "ticket": 126922,
+   "outcome": "completed",
+   "degraded": true,
+   "degrade_reasons": [
+    "triage: LLMUnavailable: FaultInjectedThrottle",
+    "draft: LLMUnavailable: FaultInjectedThrottle"
+   ],
+   "route": "escalate",
+   "time_to_complete_ms": 202
+  },
+  {
+   "ticket": 126885,
+   "outcome": "completed",
+   "degraded": true,
+   "degrade_reasons": [
+    "triage: LLMUnavailable: FaultInjectedThrottle",
+    "draft: LLMUnavailable: FaultInjectedThrottle"
+   ],
+   "route": "escalate",
+   "time_to_complete_ms": 316
+  },
+  {
+   "ticket": 126552,
+   "outcome": "completed",
+   "degraded": true,
+   "degrade_reasons": [
+    "triage: LLMUnavailable: FaultInjectedThrottle",
+    "draft: LLMUnavailable: FaultInjectedThrottle"
+   ],
+   "route": "escalate",
+   "time_to_complete_ms": 218
+  },
+  {
+   "ticket": 126468,
+   "outcome": "completed",
+   "degraded": true,
+   "degrade_reasons": [
+    "triage: LLMUnavailable: FaultInjectedThrottle",
+    "draft: LLMUnavailable: FaultInjectedThrottle"
+   ],
+   "route": "escalate",
+   "time_to_complete_ms": 223
+  },
+  {
+   "ticket": 125467,
+   "outcome": "completed",
+   "degraded": true,
+   "degrade_reasons": [
+    "triage: LLMUnavailable: FaultInjectedThrottle",
+    "draft: LLMUnavailable: FaultInjectedThrottle"
+   ],
+   "route": "escalate",
+   "time_to_complete_ms": 157
+  }
+ ],
+ "run_meta": {
+  "git_sha": "616dfef545b510ba74585a57531acef9ca4fe9bb",
+  "git_dirty": false,
+  "env": {
+   "LLM_MAX_CONCURRENCY": null,
+   "LLM_ACQUIRE_TIMEOUT_S": null,
+   "DEGRADE_DISABLED": null,
+   "FAULT_INJECT_THROTTLE": null,
+   "PROBE_PACING_S": null,
+   "EMBED_MODEL_NAME": "BAAI/bge-small-en-v1.5",
+   "BEDROCK_MODEL_ID": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+  },
+  "run_ordinal": 7,
+  "db": {
+   "chunks": 2487,
+   "chunks_md5": "d552a182a397",
+   "tickets": 401,
+   "tickets_md5": "0f062f37c56f"
+  }
+ }
+}

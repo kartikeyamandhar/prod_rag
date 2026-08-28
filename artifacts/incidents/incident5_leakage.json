@@ -27,7 +27,7 @@
  },
  "redesign_fenced": "adversarial cross-tenant content would need synthetic tickets (banned: circular eval) or retenanting (invalidates other incidents)",
  "run_meta": {
-  "git_sha": "3b82fee534dba43ee48dea07d183e0a4024179a6",
+  "git_sha": "616dfef545b510ba74585a57531acef9ca4fe9bb",
   "git_dirty": false,
   "env": {
    "LLM_MAX_CONCURRENCY": null,
@@ -38,7 +38,7 @@
    "EMBED_MODEL_NAME": "BAAI/bge-small-en-v1.5",
    "BEDROCK_MODEL_ID": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
   },
-  "run_ordinal": 4,
+  "run_ordinal": 11,
   "db": {
    "chunks": 2487,
    "chunks_md5": "d552a182a397",

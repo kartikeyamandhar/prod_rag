@@ -79,7 +79,7 @@
  ],
  "restore": "make reset-corpus (v1 never restored; audit A13)",
  "run_meta": {
-  "git_sha": "3b82fee534dba43ee48dea07d183e0a4024179a6",
+  "git_sha": "616dfef545b510ba74585a57531acef9ca4fe9bb",
   "git_dirty": false,
   "env": {
    "LLM_MAX_CONCURRENCY": null,
@@ -90,7 +90,7 @@
    "EMBED_MODEL_NAME": "BAAI/bge-small-en-v1.5",
    "BEDROCK_MODEL_ID": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
   },
-  "run_ordinal": 3,
+  "run_ordinal": 10,
   "db": {
    "chunks": 2460,
    "chunks_md5": "46a8c7c9678a",

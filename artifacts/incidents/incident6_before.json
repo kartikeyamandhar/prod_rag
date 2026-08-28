@@ -1,0 +1,138 @@
+{
+ "tag": "incident6_before",
+ "api": "http://34.213.225.151:8080",
+ "synthetic_injection": true,
+ "n": 15,
+ "outcomes": {
+  "completed": 0,
+  "completed_degraded": 0,
+  "http_5xx": 10,
+  "http_4xx": 0,
+  "transport_error": 5
+ },
+ "routes": {
+  "auto_attach": 0,
+  "escalate": 0,
+  "request_info": 0
+ },
+ "time_to_complete_ms": null,
+ "time_to_error_ms": {
+  "n": 15,
+  "p50": 77.0,
+  "p95": null,
+  "p95_note": "n=15 < 20: p95 would just be the max; see max",
+  "max": 97
+ },
+ "rows": [
+  {
+   "ticket": 139028,
+   "outcome": "http_5xx",
+   "status": 500,
+   "time_to_error_ms": 97
+  },
+  {
+   "ticket": 137797,
+   "outcome": "transport_error",
+   "error": "RemoteProtocolError",
+   "time_to_error_ms": 16
+  },
+  {
+   "ticket": 135425,
+   "outcome": "http_5xx",
+   "status": 500,
+   "time_to_error_ms": 77
+  },
+  {
+   "ticket": 133474,
+   "outcome": "http_5xx",
+   "status": 500,
+   "time_to_error_ms": 80
+  },
+  {
+   "ticket": 132719,
+   "outcome": "transport_error",
+   "error": "RemoteProtocolError",
+   "time_to_error_ms": 6
+  },
+  {
+   "ticket": 131661,
+   "outcome": "http_5xx",
+   "status": 500,
+   "time_to_error_ms": 79
+  },
+  {
+   "ticket": 131381,
+   "outcome": "http_5xx",
+   "status": 500,
+   "time_to_error_ms": 80
+  },
+  {
+   "ticket": 131045,
+   "outcome": "http_5xx",
+   "status": 500,
+   "time_to_error_ms": 87
+  },
+  {
+   "ticket": 129982,
+   "outcome": "http_5xx",
+   "status": 500,
+   "time_to_error_ms": 76
+  },
+  {
+   "ticket": 129825,
+   "outcome": "transport_error",
+   "error": "RemoteProtocolError",
+   "time_to_error_ms": 3
+  },
+  {
+   "ticket": 126922,
+   "outcome": "http_5xx",
+   "status": 500,
+   "time_to_error_ms": 78
+  },
+  {
+   "ticket": 126885,
+   "outcome": "transport_error",
+   "error": "RemoteProtocolError",
+   "time_to_error_ms": 1
+  },
+  {
+   "ticket": 126552,
+   "outcome": "http_5xx",
+   "status": 500,
+   "time_to_error_ms": 77
+  },
+  {
+   "ticket": 126468,
+   "outcome": "transport_error",
+   "error": "RemoteProtocolError",
+   "time_to_error_ms": 5
+  },
+  {
+   "ticket": 125467,
+   "outcome": "http_5xx",
+   "status": 500,
+   "time_to_error_ms": 78
+  }
+ ],
+ "run_meta": {
+  "git_sha": "616dfef545b510ba74585a57531acef9ca4fe9bb",
+  "git_dirty": false,
+  "env": {
+   "LLM_MAX_CONCURRENCY": null,
+   "LLM_ACQUIRE_TIMEOUT_S": null,
+   "DEGRADE_DISABLED": null,
+   "FAULT_INJECT_THROTTLE": null,
+   "PROBE_PACING_S": null,
+   "EMBED_MODEL_NAME": "BAAI/bge-small-en-v1.5",
+   "BEDROCK_MODEL_ID": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+  },
+  "run_ordinal": 6,
+  "db": {
+   "chunks": 2487,
+   "chunks_md5": "d552a182a397",
+   "tickets": 401,
+   "tickets_md5": "0f062f37c56f"
+  }
+ }
+}
