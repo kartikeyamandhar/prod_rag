@@ -1,20 +1,49 @@
 {
  "incident": 5,
+ "framing": "mechanism demo; the filter-off arm reproduces the tenant-blind null",
  "n_held_out": 47,
- "before_seeded_bug": {
+ "tenant_blind_null": {
+  "searchable_tickets": 354,
+  "predicted_foreign_fraction": 0.9801,
+  "meaning": "a tenant-blind retriever is expected to score this; matching it means the filter-off arm demonstrates a mechanism, not a detection metric"
+ },
+ "bug_seeded_filter_off": {
   "tenant_filter_enabled": false,
   "queries": 47,
   "queries_with_foreign_results": 47,
   "leak_incidence": 1.0,
-  "foreign_results_total": 184,
-  "ticket_results_total": 188
+  "foreign_results_total": 183,
+  "ticket_results_total": 187,
+  "observed_foreign_fraction": 0.9786
  },
- "after_fix": {
+ "after_fix_filter_on": {
   "tenant_filter_enabled": true,
   "queries": 47,
   "queries_with_foreign_results": 0,
   "leak_incidence": 0.0,
   "foreign_results_total": 0,
-  "ticket_results_total": 180
+  "ticket_results_total": 218,
+  "observed_foreign_fraction": 0.0
+ },
+ "redesign_fenced": "adversarial cross-tenant content would need synthetic tickets (banned: circular eval) or retenanting (invalidates other incidents)",
+ "run_meta": {
+  "git_sha": "3b82fee534dba43ee48dea07d183e0a4024179a6",
+  "git_dirty": false,
+  "env": {
+   "LLM_MAX_CONCURRENCY": null,
+   "LLM_ACQUIRE_TIMEOUT_S": null,
+   "DEGRADE_DISABLED": null,
+   "FAULT_INJECT_THROTTLE": null,
+   "PROBE_PACING_S": null,
+   "EMBED_MODEL_NAME": "BAAI/bge-small-en-v1.5",
+   "BEDROCK_MODEL_ID": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+  },
+  "run_ordinal": 4,
+  "db": {
+   "chunks": 2487,
+   "chunks_md5": "d552a182a397",
+   "tickets": 401,
+   "tickets_md5": "0f062f37c56f"
+  }
  }
 }

@@ -1,0 +1,26 @@
+{
+ "git_sha": "a5f0c34615d631e0c0594f4e835710b87ea7470b",
+ "git_dirty": false,
+ "env": {
+  "LLM_MAX_CONCURRENCY": null,
+  "LLM_ACQUIRE_TIMEOUT_S": null,
+  "DEGRADE_DISABLED": null,
+  "FAULT_INJECT_THROTTLE": null,
+  "PROBE_PACING_S": null,
+  "EMBED_MODEL_NAME": "BAAI/bge-small-en-v1.5",
+  "BEDROCK_MODEL_ID": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+ },
+ "run_ordinal": 6,
+ "db": {
+  "chunks": 2487,
+  "chunks_md5": "d552a182a397",
+  "tickets": 401,
+  "tickets_md5": "0f062f37c56f"
+ },
+ "covers": [
+  "artifacts/spot_check_sampling_sheet.csv",
+  "artifacts/spot_check_drafts.jsonl",
+  "artifacts/metered_smoke_2026-08-27.json"
+ ],
+ "note": "quality tier (sheet, drafts, smoke) ran at a5f0c34; git_dirty had been recorded true by the pre-fix dirty check, whose false positive was artifacts/-only churn from the same measurement pass (code was clean: the end-of-pass diff touched only artifacts/). Incident artifacts were re-measured at 3b82fee, whose only code delta is that dirty-check fix and file moves; the sheet is kept stable for the human scoring pass."
+}

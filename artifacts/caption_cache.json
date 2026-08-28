@@ -120,5 +120,61 @@
  "https://github.com/user-attachments/assets/6c6f8f91-8018-465e-af27-2d24cb6b386f": {
   "caption": "The graphs show kube-proxy nftables sync time scaling with cluster size, comparing incremental sync (fullSync=false, left) versus full sync (fullSync=true, right) modes. The left panel displays total sync time reaching over 1 minute at 50,000 services with incremental syncs, while the right panel shows full syncs reaching approximately 17 minutes at the same scale, with ListAll operations (dashed line) remaining relatively flat compared to total time (solid line), indicating the bottleneck lies in nftables rule application rather than API list operations.",
   "ticket": 139513
+ },
+ "https://github.com/kubernetes/kubernetes/assets/120258063/924129e2-4b5d-48a5-bea7-602c7b4bfdae": {
+  "caption": "The `FindPluginBySpec` function in the volume plugin manager searches for a plugin supporting a given volume specification by iterating through registered plugins and probed plugins (highlighted in red boxes). The function returns an error if the spec is nil, no plugins match, or multiple plugins support the same volume type, with error messages including \"could not find plugin because volume spec is nil\", \"no volume plugin matched\", and \"multiple volume plugins matched\".",
+  "ticket": 119348
+ },
+ "https://github.com/kubernetes/kubernetes/assets/120258063/ed4c24d1-53bb-462d-a708-3a1198dc4b5d": {
+  "caption": "The logs show a PersistentVolumeClaim (PVC) named \"pvc-89a59cdf-c8a0-4b66-b18a-55e08bbf3ba7\" failing to bind due to \"no volume plugin matched\" error in the expand_controller. The volume transitions through states (Bound, phase: Bound) but encounters an external controller expansion failure, with the system waiting for an external controller to expand the PVC in the default/pvc1 namespace while various storage plugins (vsphere-volume, portworx-volume, rbd, gce-pd, azure-file, fc) are loaded but none match the required plugin specification",
+  "ticket": 119348
+ },
+ "https://github.com/kubernetes/kubernetes/assets/1299064/3d8c8fa0-7fae-4317-bc17-8b26ddeadbf9": {
+  "caption": "This graph shows scheduler latency metrics for a 5000-node Kubernetes cluster over time, with four stacked components: Scheduler (dark blue), SchedulingLatency (gray), Score (light blue), and pod-anti-affinity (red). The chart reveals a dramatic spike in latency around the middle of the timeline, where total latency jumps from ~5ms to ~9-10ms, with the pod-anti-affinity scoring plugin (red area) contributing approximately 2.5ms of the increase and the Score component (light blue) showing the most significant growth. After the spike, latencies remain elevated at 6-8ms total before gradually stabilizing, suggesting a performance degra",
+  "ticket": 119440
+ },
+ "https://github.com/kubernetes/kubernetes/assets/16226846/9cb33bd7-4455-4357-8377-f4610af88a0f": {
+  "caption": "This graph shows two alternating metrics (magenta and blue lines) oscillating between 0% and 100% over an 8-hour period, with sharp vertical spikes indicating rapid state transitions. The synchronized but offset pattern suggests resource utilization or readiness probe failures cycling between healthy and unhealthy states, possibly indicating a Pod or container repeatedly crashing and restarting or a liveness probe misconfiguration causing cascading restarts.",
+  "ticket": 119528
+ },
+ "https://github.com/kubernetes/kubernetes/assets/16226846/f3dd3970-6e7f-41d5-8ed1-ff08a2b3ac2b": {
+  "caption": "This graph shows CPU utilization over time with a y-axis ranging from 0-100% and x-axis showing timestamps from 00:00 to beyond 08:00. The magenta/pink line indicates sustained CPU usage around 20-30% with two notable spikes reaching nearly 100% (around 02:00 and 10:00), followed by a green spike at the end, suggesting resource contention or workload scaling events in the cluster.",
+  "ticket": 119528
+ },
+ "https://github.com/kubernetes/kubernetes/assets/63291172/eb87ccec-9891-444e-a8eb-1589c693c540": {
+  "caption": "Kubelet logs showing volume lifecycle events for a pod with a flink-connector-lib container. The logs capture SyncLoop operations (ADD, DELETE, PLEG events), volume mount/unmount operations, and ultimately an orphaned pod error where the volume failed to be removed from the node at path `/var/lib/kubelet/pods/...` due to a non-empty directory with 164 accumulated errors.",
+  "ticket": 119792
+ },
+ "https://github.com/kubernetes/kubernetes/assets/44308864/b1cc4e04-15ac-4730-a862-54eddf2a4960": {
+  "caption": "A CSI volume unmount operation failed for an Azure disk PVC with error \"directory not empty\" when attempting to remove `/var/lib/kubelet/pods/fe7e6bd1-1360-udfe-89a1-ed901193b75f/volumes/kubernetes.io-csi/pvc-4377608.../mount`. The error occurred during pod deletion on node \"weizhichen-127\" with no retries permitted until 2025-08-12, indicating a stuck volumeAttachment resource preventing the volume from being properly detached.",
+  "ticket": 119921
+ },
+ "https://github.com/kubernetes/kubernetes/assets/89568107/a12f4f70-ff90-4960-a5b7-2f8d64ae7ffb": {
+  "caption": "Documentation excerpt showing Pod port specification fields from the Kubernetes API reference. The highlighted `ports.name` field (string type) specifies that named ports must conform to IANA_SVC_NAME format and be unique within a Pod, allowing Services to reference ports by name. Additional port fields shown include `containerPort` (int32), `hostIP` (string), `hostPort` (int32), and `protocol` (string, supporting UDP/TCP/SCTP).",
+  "ticket": 122150
+ },
+ "https://github.com/kubernetes/kubernetes/assets/89568107/15576707-f22d-4dfe-bc96-1ca50f6d7d8b": {
+  "caption": "The output shows a Pod specification for `alertmanager-main-0` retrieved via `kubectl get pod` with YAML output. The Pod contains multiple containers including `alertmanager` (listening on port 9093) and `alertmanager-proxy` (port 9095), with mounted volumes for PKI certificates, configuration files, and secrets including `alertmanager-kube-rbac-proxy` and `alertmanager-kube-rbac-proxy-metric` with a defaultMode of 420.",
+  "ticket": 122150
+ },
+ "https://github.com/kubernetes/kubernetes/assets/87749576/886ccf51-0b08-4c99-a781-a53de7c00766": {
+  "caption": "The output shows `kubectl top pod -A|grep sch` displaying memory and CPU usage for kube-system namespace pods. Three kube-scheduler instances (kube-scheduler-k8s-master-01, 02, 03) are listed with their respective memory consumption (31Mi, 29Mi, 3444Mi) and CPU usage, with master-03's scheduler showing significantly elevated memory usage at 3444Mi compared to the others, indicating a potential memory leak or resource exhaustion issue in that scheduler instance.",
+  "ticket": 122661
+ },
+ "https://github.com/kubernetes/kubernetes/assets/46313756/96efe990-54c0-41c6-8d10-9d06898b6967": {
+  "caption": "Two PersistentVolumeClaim (PVC) resources are bound to PersistentVolumes (PVs) with IDs ending in -ddkbk-share and -fvqf2-share, each with 30Gi capacity and ReadWriteOnce (RWO) access mode. Both PVCs are mounted on localhost and backed by Filesystem storage, with binding times of 7h5m and 7h19m respectively.",
+  "ticket": 123592
+ },
+ "https://github.com/kubernetes/kubernetes/assets/1299064/d82a658e-ae01-4bcd-9e0d-6ab892bee6c2": {
+  "caption": "This is a CPU flame graph showing scheduler performance profiling data, with the dominant call stack being `scheduler(*Scheduler).findNodesThatFitPod` consuming 9.26 seconds (46.35% of total CPU time). The graph reveals that the scheduler's node filtering logic is the primary bottleneck, with subsidiary calls to `wait.UntilWithContext`, `wait.BackoffUntil`, and various runtime operations contributing to the overall scheduling latency.",
+  "ticket": 124709
+ },
+ "https://github.com/kubernetes/kubernetes/assets/8870947/7f97ebcb-b963-4c02-9cce-bcc5b040a558": {
+  "caption": "This sequence diagram shows a Pod lifecycle with volume attachment failures in Kubernetes. The operation creates a Pod at 10:04:56, followed by mountVolume starting and MapVolume.MapPodDevice succeeding, but then MapVolume.NodeExpandVolume fails at 10:05:17. Subsequently, unmountDevice operations fail repeatedly (at 10:06:16 and 10:06:17) with the error that the CSI volumeDevice \"/var/lib/kubelet/plugins/kubernetes.io/csi/volumedevices/{pv}/dev\" is still referenced from other Pods, triggering reconcile loops.",
+  "ticket": 125541
+ },
+ "https://github.com/kubernetes/kubernetes/assets/19217340/7686ae10-e598-4d8f-8c8c-b28b16338912": {
+  "caption": "This diagram illustrates a race condition in Kubernetes controller synchronization across Pod lister, Endpoint lister, and etcd components. At t1 all components show ready state, but at t2 a pod update event causes the Pod lister to transition to \"not ready\" while the Endpoint lister incorrectly remains \"ready\" (shown in red), with etcd also showing \"notReady\" in red. By t3 the Pod lister recovers to \"ready\" very quickly (xxMS), but the Endpoint lister stays stuck in the \"ready\" state (red), creating a state mismatch. At t4 an endpoint update event finally pushes the Endpoint lister",
+  "ticket": 125638
  }
 }

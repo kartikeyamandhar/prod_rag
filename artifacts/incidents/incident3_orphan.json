@@ -2,29 +2,100 @@
  "incident": 3,
  "scripted": true,
  "deleted_page": "content/en/docs/concepts/services-networking/ingress.md",
- "query": "ingress path routing rules for services",
- "top5_before": [
-  "content/en/docs/concepts/services-networking/ingress.md",
-  "content/en/docs/concepts/services-networking/_index.md",
-  "content/en/docs/concepts/services-networking/service.md",
-  "content/en/docs/concepts/services-networking/ingress.md",
-  "content/en/docs/concepts/services-networking/ingress.md"
- ],
- "target_in_top5_before": true,
  "chunks_removed": 27,
- "top5_after": [
-  "content/en/docs/concepts/services-networking/_index.md",
-  "content/en/docs/concepts/services-networking/service.md",
-  "content/en/docs/concepts/services-networking/topology-aware-routing.md",
-  "content/en/docs/concepts/services-networking/network-policies.md",
-  "content/en/docs/concepts/services-networking/service.md"
+ "retrieval_path": "hybrid_search top-8, docs items",
+ "queries": [
+  {
+   "query": "ingress path routing rules for services",
+   "target_served_before": true,
+   "target_served_after": false,
+   "docs_before": [
+    "content/en/docs/concepts/services-networking/ingress.md",
+    "content/en/docs/concepts/services-networking/ingress.md",
+    "content/en/docs/concepts/services-networking/ingress.md",
+    "content/en/docs/concepts/services-networking/ingress.md",
+    "content/en/docs/concepts/services-networking/ingress.md",
+    "content/en/docs/concepts/services-networking/service.md"
+   ],
+   "docs_after": [
+    "content/en/docs/concepts/services-networking/network-policies.md",
+    "content/en/docs/concepts/services-networking/service.md",
+    "content/en/docs/concepts/services-networking/service.md",
+    "content/en/docs/concepts/services-networking/ingress-controllers.md",
+    "content/en/docs/concepts/services-networking/_index.md",
+    "content/en/docs/concepts/services-networking/ingress-controllers.md"
+   ]
+  },
+  {
+   "query": "how do I route external HTTP traffic to different services by URL path",
+   "target_served_before": false,
+   "target_served_after": false,
+   "docs_before": [
+    "content/en/docs/concepts/services-networking/service.md",
+    "content/en/docs/concepts/services-networking/service.md",
+    "content/en/docs/concepts/services-networking/service.md",
+    "content/en/docs/concepts/services-networking/gateway.md",
+    "content/en/docs/concepts/services-networking/service.md"
+   ],
+   "docs_after": [
+    "content/en/docs/concepts/services-networking/service.md",
+    "content/en/docs/concepts/services-networking/service.md",
+    "content/en/docs/concepts/services-networking/service.md",
+    "content/en/docs/concepts/services-networking/gateway.md",
+    "content/en/docs/concepts/services-networking/service.md"
+   ]
+  },
+  {
+   "query": "ingress backend service not receiving traffic",
+   "target_served_before": true,
+   "target_served_after": false,
+   "docs_before": [
+    "content/en/docs/concepts/services-networking/ingress.md",
+    "content/en/docs/concepts/services-networking/ingress.md",
+    "content/en/docs/concepts/services-networking/ingress.md",
+    "content/en/docs/concepts/services-networking/ingress.md",
+    "content/en/docs/concepts/services-networking/ingress.md",
+    "content/en/docs/concepts/services-networking/ingress.md",
+    "content/en/docs/concepts/services-networking/service.md",
+    "content/en/docs/concepts/services-networking/ingress.md"
+   ],
+   "docs_after": [
+    "content/en/docs/concepts/services-networking/service.md",
+    "content/en/docs/concepts/services-networking/service.md",
+    "content/en/docs/concepts/services-networking/service-traffic-policy.md",
+    "content/en/docs/concepts/services-networking/network-policies.md",
+    "content/en/docs/concepts/services-networking/ingress-controllers.md",
+    "content/en/docs/concepts/services-networking/ingress-controllers.md",
+    "content/en/docs/concepts/services-networking/_index.md"
+   ]
+  }
  ],
- "target_in_top5_after": false,
  "ledger": [
   [
    "scripted:incident-3",
    "deleted",
    27
   ]
- ]
+ ],
+ "restore": "make reset-corpus (v1 never restored; audit A13)",
+ "run_meta": {
+  "git_sha": "3b82fee534dba43ee48dea07d183e0a4024179a6",
+  "git_dirty": false,
+  "env": {
+   "LLM_MAX_CONCURRENCY": null,
+   "LLM_ACQUIRE_TIMEOUT_S": null,
+   "DEGRADE_DISABLED": null,
+   "FAULT_INJECT_THROTTLE": null,
+   "PROBE_PACING_S": null,
+   "EMBED_MODEL_NAME": "BAAI/bge-small-en-v1.5",
+   "BEDROCK_MODEL_ID": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+  },
+  "run_ordinal": 3,
+  "db": {
+   "chunks": 2460,
+   "chunks_md5": "46a8c7c9678a",
+   "tickets": 401,
+   "tickets_md5": "0f062f37c56f"
+  }
+ }
 }

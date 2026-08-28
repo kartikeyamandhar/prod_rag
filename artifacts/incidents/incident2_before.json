@@ -1,50 +1,418 @@
 {
  "incident": 2,
  "tag": "before",
- "changed_pages_probed": 8,
- "stale_pages_in_db": 8,
- "queries_serving_stale_content": 8,
- "stale_serving_incidence": 1.0,
+ "staleness_definition": "chunked origin/main text differs from DB chunk text",
+ "upstream_pages": {
+  "modified": 38,
+  "of_modified_content_changed": 37,
+  "of_modified_chunk_identical": 1,
+  "of_modified_missing_from_db": 0,
+  "added_not_measurable": 11,
+  "deleted_not_measurable": 1,
+  "renamed_not_measurable": 1
+ },
+ "stale_pages": [
+  "content/en/docs/concepts/cluster-administration/admission-webhooks-good-practices.md",
+  "content/en/docs/concepts/configuration/manage-resources-containers.md",
+  "content/en/docs/concepts/extend-kubernetes/api-extension/custom-resources.md",
+  "content/en/docs/concepts/scheduling-eviction/_index.md",
+  "content/en/docs/concepts/scheduling-eviction/gang-scheduling.md",
+  "content/en/docs/concepts/scheduling-eviction/node-declared-features.md",
+  "content/en/docs/concepts/scheduling-eviction/node-pressure-eviction.md",
+  "content/en/docs/concepts/scheduling-eviction/pod-priority-preemption.md",
+  "content/en/docs/concepts/scheduling-eviction/podgroup-scheduling.md",
+  "content/en/docs/concepts/scheduling-eviction/scheduler-perf-tuning.md",
+  "content/en/docs/concepts/scheduling-eviction/topology-aware-scheduling.md",
+  "content/en/docs/concepts/scheduling-eviction/workload-aware-preemption.md",
+  "content/en/docs/concepts/security/pod-security-standards.md",
+  "content/en/docs/concepts/services-networking/gateway.md",
+  "content/en/docs/concepts/services-networking/service.md",
+  "content/en/docs/concepts/storage/projected-volumes.md",
+  "content/en/docs/concepts/storage/storage-classes.md",
+  "content/en/docs/concepts/storage/storage-limits.md",
+  "content/en/docs/concepts/storage/volume-health-monitoring.md",
+  "content/en/docs/concepts/storage/volume-snapshots.md",
+  "content/en/docs/concepts/storage/volumes.md",
+  "content/en/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale.md",
+  "content/en/docs/concepts/workloads/controllers/job.md",
+  "content/en/docs/concepts/workloads/controllers/statefulset.md",
+  "content/en/docs/concepts/workloads/podgroup-api/_index.md",
+  "content/en/docs/concepts/workloads/podgroup-api/lifecycle.md",
+  "content/en/docs/concepts/workloads/pods/_index.md",
+  "content/en/docs/concepts/workloads/pods/pod-condition.md",
+  "content/en/docs/concepts/workloads/pods/pod-lifecycle.md",
+  "content/en/docs/concepts/workloads/pods/pod-qos.md",
+  "content/en/docs/concepts/workloads/pods/probes.md",
+  "content/en/docs/concepts/workloads/pods/scheduling-group.md",
+  "content/en/docs/concepts/workloads/pods/user-namespaces.md",
+  "content/en/docs/concepts/workloads/workload-api/_index.md",
+  "content/en/docs/concepts/workloads/workload-api/disruption-and-priority.md",
+  "content/en/docs/concepts/workloads/workload-api/policies.md",
+  "content/en/docs/concepts/workloads/workload-api/topology-aware-scheduling.md"
+ ],
+ "queries": 47,
+ "queries_serving_stale_docs": 34,
+ "stale_serving_incidence": 0.723,
  "rows": [
   {
-   "query": "Secrets",
-   "page": "content/en/docs/concepts/configuration/secret.md",
-   "stale_chunks_in_top5": 4
+   "ticket": 107372,
+   "stale_docs_in_top8": 3,
+   "keys": [
+    "docs:33282",
+    "docs:33283",
+    "docs:33028"
+   ]
   },
   {
-   "query": "Custom Resources",
-   "page": "content/en/docs/concepts/extend-kubernetes/api-extension/custom-resources.md",
-   "stale_chunks_in_top5": 5
+   "ticket": 107405,
+   "stale_docs_in_top8": 0,
+   "keys": []
   },
   {
-   "query": "Pod Priority and Preemption",
-   "page": "content/en/docs/concepts/scheduling-eviction/pod-priority-preemption.md",
-   "stale_chunks_in_top5": 5
+   "ticket": 107886,
+   "stale_docs_in_top8": 2,
+   "keys": [
+    "docs:34654",
+    "docs:34575"
+   ]
   },
   {
-   "query": "Topology-Aware Workload Scheduling",
-   "page": "content/en/docs/concepts/scheduling-eviction/topology-aware-scheduling.md",
-   "stale_chunks_in_top5": 2
+   "ticket": 107927,
+   "stale_docs_in_top8": 0,
+   "keys": []
   },
   {
-   "query": "Gateway API",
-   "page": "content/en/docs/concepts/services-networking/gateway.md",
-   "stale_chunks_in_top5": 5
+   "ticket": 108579,
+   "stale_docs_in_top8": 0,
+   "keys": []
   },
   {
-   "query": "Storage Classes",
-   "page": "content/en/docs/concepts/storage/storage-classes.md",
-   "stale_chunks_in_top5": 3
+   "ticket": 110357,
+   "stale_docs_in_top8": 0,
+   "keys": []
   },
   {
-   "query": "Volumes",
-   "page": "content/en/docs/concepts/storage/volumes.md",
-   "stale_chunks_in_top5": 4
+   "ticket": 111321,
+   "stale_docs_in_top8": 0,
+   "keys": []
   },
   {
-   "query": "Pods",
-   "page": "content/en/docs/concepts/workloads/pods/_index.md",
-   "stale_chunks_in_top5": 5
+   "ticket": 111933,
+   "stale_docs_in_top8": 1,
+   "keys": [
+    "docs:34654"
+   ]
+  },
+  {
+   "ticket": 112143,
+   "stale_docs_in_top8": 1,
+   "keys": [
+    "docs:34355"
+   ]
+  },
+  {
+   "ticket": 112171,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 113139,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 114115,
+   "stale_docs_in_top8": 4,
+   "keys": [
+    "docs:35026",
+    "docs:34992",
+    "docs:33000",
+    "docs:35027"
+   ]
+  },
+  {
+   "ticket": 114815,
+   "stale_docs_in_top8": 4,
+   "keys": [
+    "docs:34369",
+    "docs:34362",
+    "docs:34367",
+    "docs:34366"
+   ]
+  },
+  {
+   "ticket": 114996,
+   "stale_docs_in_top8": 2,
+   "keys": [
+    "docs:34659",
+    "docs:34654"
+   ]
+  },
+  {
+   "ticket": 115044,
+   "stale_docs_in_top8": 4,
+   "keys": [
+    "docs:34659",
+    "docs:34655",
+    "docs:34653",
+    "docs:34654"
+   ]
+  },
+  {
+   "ticket": 115294,
+   "stale_docs_in_top8": 2,
+   "keys": [
+    "docs:34655",
+    "docs:34659"
+   ]
+  },
+  {
+   "ticket": 115343,
+   "stale_docs_in_top8": 2,
+   "keys": [
+    "docs:34661",
+    "docs:34662"
+   ]
+  },
+  {
+   "ticket": 116710,
+   "stale_docs_in_top8": 1,
+   "keys": [
+    "docs:33258"
+   ]
+  },
+  {
+   "ticket": 116831,
+   "stale_docs_in_top8": 2,
+   "keys": [
+    "docs:33835",
+    "docs:33270"
+   ]
+  },
+  {
+   "ticket": 117745,
+   "stale_docs_in_top8": 1,
+   "keys": [
+    "docs:33808"
+   ]
+  },
+  {
+   "ticket": 118151,
+   "stale_docs_in_top8": 4,
+   "keys": [
+    "docs:34560",
+    "docs:33017",
+    "docs:34615",
+    "docs:34644"
+   ]
+  },
+  {
+   "ticket": 119767,
+   "stale_docs_in_top8": 3,
+   "keys": [
+    "docs:35196",
+    "docs:35198",
+    "docs:35195"
+   ]
+  },
+  {
+   "ticket": 120268,
+   "stale_docs_in_top8": 4,
+   "keys": [
+    "docs:34655",
+    "docs:34659",
+    "docs:35181",
+    "docs:34566"
+   ]
+  },
+  {
+   "ticket": 120937,
+   "stale_docs_in_top8": 1,
+   "keys": [
+    "docs:34380"
+   ]
+  },
+  {
+   "ticket": 121294,
+   "stale_docs_in_top8": 2,
+   "keys": [
+    "docs:34618",
+    "docs:34663"
+   ]
+  },
+  {
+   "ticket": 121794,
+   "stale_docs_in_top8": 2,
+   "keys": [
+    "docs:33283",
+    "docs:34369"
+   ]
+  },
+  {
+   "ticket": 121942,
+   "stale_docs_in_top8": 1,
+   "keys": [
+    "docs:34359"
+   ]
+  },
+  {
+   "ticket": 122057,
+   "stale_docs_in_top8": 2,
+   "keys": [
+    "docs:33906",
+    "docs:33902"
+   ]
+  },
+  {
+   "ticket": 123119,
+   "stale_docs_in_top8": 1,
+   "keys": [
+    "docs:33841"
+   ]
+  },
+  {
+   "ticket": 124749,
+   "stale_docs_in_top8": 3,
+   "keys": [
+    "docs:35025",
+    "docs:35027",
+    "docs:35228"
+   ]
+  },
+  {
+   "ticket": 125012,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 125354,
+   "stale_docs_in_top8": 1,
+   "keys": [
+    "docs:34355"
+   ]
+  },
+  {
+   "ticket": 125467,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 126468,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 126552,
+   "stale_docs_in_top8": 2,
+   "keys": [
+    "docs:34527",
+    "docs:33438"
+   ]
+  },
+  {
+   "ticket": 126885,
+   "stale_docs_in_top8": 1,
+   "keys": [
+    "docs:34369"
+   ]
+  },
+  {
+   "ticket": 126922,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 129825,
+   "stale_docs_in_top8": 1,
+   "keys": [
+    "docs:34659"
+   ]
+  },
+  {
+   "ticket": 129982,
+   "stale_docs_in_top8": 4,
+   "keys": [
+    "docs:33252",
+    "docs:33270",
+    "docs:33283",
+    "docs:35181"
+   ]
+  },
+  {
+   "ticket": 131045,
+   "stale_docs_in_top8": 1,
+   "keys": [
+    "docs:33449"
+   ]
+  },
+  {
+   "ticket": 131381,
+   "stale_docs_in_top8": 1,
+   "keys": [
+    "docs:34659"
+   ]
+  },
+  {
+   "ticket": 131661,
+   "stale_docs_in_top8": 4,
+   "keys": [
+    "docs:33802",
+    "docs:35208",
+    "docs:34899",
+    "docs:33803"
+   ]
+  },
+  {
+   "ticket": 132719,
+   "stale_docs_in_top8": 1,
+   "keys": [
+    "docs:34369"
+   ]
+  },
+  {
+   "ticket": 133474,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 135425,
+   "stale_docs_in_top8": 1,
+   "keys": [
+    "docs:33449"
+   ]
+  },
+  {
+   "ticket": 137797,
+   "stale_docs_in_top8": 2,
+   "keys": [
+    "docs:34655",
+    "docs:34599"
+   ]
+  },
+  {
+   "ticket": 139028,
+   "stale_docs_in_top8": 0,
+   "keys": []
   }
- ]
+ ],
+ "run_meta": {
+  "git_sha": "3b82fee534dba43ee48dea07d183e0a4024179a6",
+  "git_dirty": false,
+  "env": {
+   "LLM_MAX_CONCURRENCY": null,
+   "LLM_ACQUIRE_TIMEOUT_S": null,
+   "DEGRADE_DISABLED": null,
+   "FAULT_INJECT_THROTTLE": null,
+   "PROBE_PACING_S": null,
+   "EMBED_MODEL_NAME": "BAAI/bge-small-en-v1.5",
+   "BEDROCK_MODEL_ID": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+  },
+  "run_ordinal": 1,
+  "db": {
+   "chunks": 2487,
+   "chunks_md5": "d552a182a397",
+   "tickets": 401,
+   "tickets_md5": "0f062f37c56f"
+  }
+ }
 }

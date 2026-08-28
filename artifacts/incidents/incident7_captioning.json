@@ -1,25 +1,1088 @@
 {
  "incident": 7,
- "diagram_tickets": 32,
- "corpus_rows_recaptioned": 16,
+ "effective_n": {
+  "has_images_tickets": 32,
+  "with_extractable_urls": 30,
+  "with_usable_caption": 30,
+  "note": "query arms only differ from baseline on with_usable_caption tickets"
+ },
+ "caption_pass": {
+  "captioned": 0,
+  "cached_hits": 45,
+  "permanent_fail": 0,
+  "transient_fail": 0
+ },
+ "corpus_rows_recaptioned": 27,
  "caption_usage": {
-  "calls": 29,
-  "input_tokens": 25392,
-  "output_tokens": 3285,
-  "usd_at_list_rates": 0.0418
+  "calls": 0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "usd_at_list_rates": 0.0
  },
- "before_image_blind": {
-  "n": 32,
-  "same_sig_ticket_in_top8": 28,
-  "same_sig_rate": 0.875,
-  "docs_domain_in_top8": 23,
-  "docs_domain_rate": 0.719
+ "arms": {
+  "baseline_image_blind": {
+   "n": 32,
+   "tenant_filter": true,
+   "same_sig_hits_top8": 28,
+   "same_sig_mrr_at8": 0.7284,
+   "same_sig_median_rank": 1,
+   "docs_domain_hits_top8": 18,
+   "docs_domain_mrr_at8": 0.2178,
+   "per_ticket": [
+    {
+     "ticket": 108665,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 110208,
+     "sig_rank": null,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 112720,
+     "sig_rank": 1,
+     "docs_rank": 6
+    },
+    {
+     "ticket": 114207,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 114440,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 116427,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 116710,
+     "sig_rank": 3,
+     "docs_rank": null
+    },
+    {
+     "ticket": 116847,
+     "sig_rank": 1,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 117592,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 119348,
+     "sig_rank": 2,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 119440,
+     "sig_rank": null,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 119528,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 119792,
+     "sig_rank": 1,
+     "docs_rank": 7
+    },
+    {
+     "ticket": 119921,
+     "sig_rank": 1,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 122150,
+     "sig_rank": 7,
+     "docs_rank": 4
+    },
+    {
+     "ticket": 122661,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 123592,
+     "sig_rank": null,
+     "docs_rank": 3
+    },
+    {
+     "ticket": 124709,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 125541,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 125638,
+     "sig_rank": 2,
+     "docs_rank": null
+    },
+    {
+     "ticket": 127229,
+     "sig_rank": 1,
+     "docs_rank": 4
+    },
+    {
+     "ticket": 128928,
+     "sig_rank": 3,
+     "docs_rank": 4
+    },
+    {
+     "ticket": 128949,
+     "sig_rank": 2,
+     "docs_rank": null
+    },
+    {
+     "ticket": 129146,
+     "sig_rank": 2,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 129982,
+     "sig_rank": null,
+     "docs_rank": null
+    },
+    {
+     "ticket": 132719,
+     "sig_rank": 2,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 133365,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 135089,
+     "sig_rank": 1,
+     "docs_rank": 6
+    },
+    {
+     "ticket": 135323,
+     "sig_rank": 1,
+     "docs_rank": 6
+    },
+    {
+     "ticket": 136626,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 137218,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 139513,
+     "sig_rank": 1,
+     "docs_rank": 7
+    }
+   ]
+  },
+  "query_captions_only": {
+   "n": 32,
+   "tenant_filter": true,
+   "same_sig_hits_top8": 29,
+   "same_sig_mrr_at8": 0.7269,
+   "same_sig_median_rank": 1,
+   "docs_domain_hits_top8": 15,
+   "docs_domain_mrr_at8": 0.1548,
+   "per_ticket": [
+    {
+     "ticket": 108665,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 110208,
+     "sig_rank": null,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 112720,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 114207,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 114440,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 116427,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 116710,
+     "sig_rank": 3,
+     "docs_rank": null
+    },
+    {
+     "ticket": 116847,
+     "sig_rank": 1,
+     "docs_rank": 3
+    },
+    {
+     "ticket": 117592,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 119348,
+     "sig_rank": 1,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 119440,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 119528,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 119792,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 119921,
+     "sig_rank": 1,
+     "docs_rank": 7
+    },
+    {
+     "ticket": 122150,
+     "sig_rank": 7,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 122661,
+     "sig_rank": 4,
+     "docs_rank": null
+    },
+    {
+     "ticket": 123592,
+     "sig_rank": null,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 124709,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 125541,
+     "sig_rank": 1,
+     "docs_rank": 7
+    },
+    {
+     "ticket": 125638,
+     "sig_rank": 2,
+     "docs_rank": null
+    },
+    {
+     "ticket": 127229,
+     "sig_rank": 1,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 128928,
+     "sig_rank": 5,
+     "docs_rank": null
+    },
+    {
+     "ticket": 128949,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 129146,
+     "sig_rank": 2,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 129982,
+     "sig_rank": null,
+     "docs_rank": null
+    },
+    {
+     "ticket": 132719,
+     "sig_rank": 3,
+     "docs_rank": null
+    },
+    {
+     "ticket": 133365,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 135089,
+     "sig_rank": 1,
+     "docs_rank": 6
+    },
+    {
+     "ticket": 135323,
+     "sig_rank": 2,
+     "docs_rank": 6
+    },
+    {
+     "ticket": 136626,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 137218,
+     "sig_rank": 2,
+     "docs_rank": null
+    },
+    {
+     "ticket": 139513,
+     "sig_rank": 1,
+     "docs_rank": null
+    }
+   ]
+  },
+  "corpus_captions_only": {
+   "n": 32,
+   "tenant_filter": true,
+   "same_sig_hits_top8": 28,
+   "same_sig_mrr_at8": 0.7571,
+   "same_sig_median_rank": 1,
+   "docs_domain_hits_top8": 18,
+   "docs_domain_mrr_at8": 0.2167,
+   "per_ticket": [
+    {
+     "ticket": 108665,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 110208,
+     "sig_rank": null,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 112720,
+     "sig_rank": 1,
+     "docs_rank": 6
+    },
+    {
+     "ticket": 114207,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 114440,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 116427,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 116710,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 116847,
+     "sig_rank": 1,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 117592,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 119348,
+     "sig_rank": 2,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 119440,
+     "sig_rank": null,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 119528,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 119792,
+     "sig_rank": 1,
+     "docs_rank": 7
+    },
+    {
+     "ticket": 119921,
+     "sig_rank": 1,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 122150,
+     "sig_rank": 7,
+     "docs_rank": 4
+    },
+    {
+     "ticket": 122661,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 123592,
+     "sig_rank": null,
+     "docs_rank": 3
+    },
+    {
+     "ticket": 124709,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 125541,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 125638,
+     "sig_rank": 2,
+     "docs_rank": null
+    },
+    {
+     "ticket": 127229,
+     "sig_rank": 1,
+     "docs_rank": 4
+    },
+    {
+     "ticket": 128928,
+     "sig_rank": 3,
+     "docs_rank": 4
+    },
+    {
+     "ticket": 128949,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 129146,
+     "sig_rank": 2,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 129982,
+     "sig_rank": null,
+     "docs_rank": null
+    },
+    {
+     "ticket": 132719,
+     "sig_rank": 4,
+     "docs_rank": 6
+    },
+    {
+     "ticket": 133365,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 135089,
+     "sig_rank": 1,
+     "docs_rank": 6
+    },
+    {
+     "ticket": 135323,
+     "sig_rank": 1,
+     "docs_rank": 6
+    },
+    {
+     "ticket": 136626,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 137218,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 139513,
+     "sig_rank": 1,
+     "docs_rank": 7
+    }
+   ]
+  },
+  "both": {
+   "n": 32,
+   "tenant_filter": true,
+   "same_sig_hits_top8": 29,
+   "same_sig_mrr_at8": 0.7477,
+   "same_sig_median_rank": 1,
+   "docs_domain_hits_top8": 15,
+   "docs_domain_mrr_at8": 0.1548,
+   "per_ticket": [
+    {
+     "ticket": 108665,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 110208,
+     "sig_rank": null,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 112720,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 114207,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 114440,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 116427,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 116710,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 116847,
+     "sig_rank": 1,
+     "docs_rank": 3
+    },
+    {
+     "ticket": 117592,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 119348,
+     "sig_rank": 1,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 119440,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 119528,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 119792,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 119921,
+     "sig_rank": 1,
+     "docs_rank": 7
+    },
+    {
+     "ticket": 122150,
+     "sig_rank": 7,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 122661,
+     "sig_rank": 4,
+     "docs_rank": null
+    },
+    {
+     "ticket": 123592,
+     "sig_rank": null,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 124709,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 125541,
+     "sig_rank": 1,
+     "docs_rank": 7
+    },
+    {
+     "ticket": 125638,
+     "sig_rank": 2,
+     "docs_rank": null
+    },
+    {
+     "ticket": 127229,
+     "sig_rank": 1,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 128928,
+     "sig_rank": 5,
+     "docs_rank": null
+    },
+    {
+     "ticket": 128949,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 129146,
+     "sig_rank": 2,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 129982,
+     "sig_rank": null,
+     "docs_rank": null
+    },
+    {
+     "ticket": 132719,
+     "sig_rank": 3,
+     "docs_rank": null
+    },
+    {
+     "ticket": 133365,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 135089,
+     "sig_rank": 1,
+     "docs_rank": 6
+    },
+    {
+     "ticket": 135323,
+     "sig_rank": 2,
+     "docs_rank": 6
+    },
+    {
+     "ticket": 136626,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 137218,
+     "sig_rank": 2,
+     "docs_rank": null
+    },
+    {
+     "ticket": 139513,
+     "sig_rank": 1,
+     "docs_rank": null
+    }
+   ]
+  },
+  "corpus_captions_only_filter_off": {
+   "n": 32,
+   "tenant_filter": false,
+   "same_sig_hits_top8": 32,
+   "same_sig_mrr_at8": 0.638,
+   "same_sig_median_rank": 2,
+   "docs_domain_hits_top8": 21,
+   "docs_domain_mrr_at8": 0.3471,
+   "per_ticket": [
+    {
+     "ticket": 108665,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 110208,
+     "sig_rank": 1,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 112720,
+     "sig_rank": 1,
+     "docs_rank": 4
+    },
+    {
+     "ticket": 114207,
+     "sig_rank": 1,
+     "docs_rank": 4
+    },
+    {
+     "ticket": 114440,
+     "sig_rank": 2,
+     "docs_rank": null
+    },
+    {
+     "ticket": 116427,
+     "sig_rank": 2,
+     "docs_rank": 3
+    },
+    {
+     "ticket": 116710,
+     "sig_rank": 4,
+     "docs_rank": null
+    },
+    {
+     "ticket": 116847,
+     "sig_rank": 2,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 117592,
+     "sig_rank": 2,
+     "docs_rank": null
+    },
+    {
+     "ticket": 119348,
+     "sig_rank": 2,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 119440,
+     "sig_rank": 1,
+     "docs_rank": 3
+    },
+    {
+     "ticket": 119528,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 119792,
+     "sig_rank": 3,
+     "docs_rank": 6
+    },
+    {
+     "ticket": 119921,
+     "sig_rank": 2,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 122150,
+     "sig_rank": 3,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 122661,
+     "sig_rank": 1,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 123592,
+     "sig_rank": 4,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 124709,
+     "sig_rank": 2,
+     "docs_rank": 8
+    },
+    {
+     "ticket": 125541,
+     "sig_rank": 2,
+     "docs_rank": null
+    },
+    {
+     "ticket": 125638,
+     "sig_rank": 2,
+     "docs_rank": null
+    },
+    {
+     "ticket": 127229,
+     "sig_rank": 2,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 128928,
+     "sig_rank": 2,
+     "docs_rank": 4
+    },
+    {
+     "ticket": 128949,
+     "sig_rank": 2,
+     "docs_rank": null
+    },
+    {
+     "ticket": 129146,
+     "sig_rank": 3,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 129982,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 132719,
+     "sig_rank": 4,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 133365,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 135089,
+     "sig_rank": 1,
+     "docs_rank": 3
+    },
+    {
+     "ticket": 135323,
+     "sig_rank": 1,
+     "docs_rank": 6
+    },
+    {
+     "ticket": 136626,
+     "sig_rank": 3,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 137218,
+     "sig_rank": 3,
+     "docs_rank": null
+    },
+    {
+     "ticket": 139513,
+     "sig_rank": 1,
+     "docs_rank": null
+    }
+   ]
+  },
+  "both_filter_off": {
+   "n": 32,
+   "tenant_filter": false,
+   "same_sig_hits_top8": 31,
+   "same_sig_mrr_at8": 0.6286,
+   "same_sig_median_rank": 2,
+   "docs_domain_hits_top8": 23,
+   "docs_domain_mrr_at8": 0.348,
+   "per_ticket": [
+    {
+     "ticket": 108665,
+     "sig_rank": 1,
+     "docs_rank": 4
+    },
+    {
+     "ticket": 110208,
+     "sig_rank": 2,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 112720,
+     "sig_rank": 3,
+     "docs_rank": 8
+    },
+    {
+     "ticket": 114207,
+     "sig_rank": 1,
+     "docs_rank": 3
+    },
+    {
+     "ticket": 114440,
+     "sig_rank": 3,
+     "docs_rank": null
+    },
+    {
+     "ticket": 116427,
+     "sig_rank": 2,
+     "docs_rank": null
+    },
+    {
+     "ticket": 116710,
+     "sig_rank": 3,
+     "docs_rank": null
+    },
+    {
+     "ticket": 116847,
+     "sig_rank": 3,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 117592,
+     "sig_rank": 2,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 119348,
+     "sig_rank": 5,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 119440,
+     "sig_rank": 1,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 119528,
+     "sig_rank": null,
+     "docs_rank": null
+    },
+    {
+     "ticket": 119792,
+     "sig_rank": 2,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 119921,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 122150,
+     "sig_rank": 2,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 122661,
+     "sig_rank": 4,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 123592,
+     "sig_rank": 1,
+     "docs_rank": 4
+    },
+    {
+     "ticket": 124709,
+     "sig_rank": 1,
+     "docs_rank": 2
+    },
+    {
+     "ticket": 125541,
+     "sig_rank": 1,
+     "docs_rank": 6
+    },
+    {
+     "ticket": 125638,
+     "sig_rank": 4,
+     "docs_rank": null
+    },
+    {
+     "ticket": 127229,
+     "sig_rank": 2,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 128928,
+     "sig_rank": 2,
+     "docs_rank": null
+    },
+    {
+     "ticket": 128949,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 129146,
+     "sig_rank": 2,
+     "docs_rank": 1
+    },
+    {
+     "ticket": 129982,
+     "sig_rank": 4,
+     "docs_rank": null
+    },
+    {
+     "ticket": 132719,
+     "sig_rank": 1,
+     "docs_rank": 3
+    },
+    {
+     "ticket": 133365,
+     "sig_rank": 1,
+     "docs_rank": null
+    },
+    {
+     "ticket": 135089,
+     "sig_rank": 1,
+     "docs_rank": 3
+    },
+    {
+     "ticket": 135323,
+     "sig_rank": 1,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 136626,
+     "sig_rank": 3,
+     "docs_rank": 5
+    },
+    {
+     "ticket": 137218,
+     "sig_rank": 2,
+     "docs_rank": null
+    },
+    {
+     "ticket": 139513,
+     "sig_rank": 1,
+     "docs_rank": 7
+    }
+   ]
+  }
  },
- "after_captioning": {
-  "n": 32,
-  "same_sig_ticket_in_top8": 27,
-  "same_sig_rate": 0.844,
-  "docs_domain_in_top8": 22,
-  "docs_domain_rate": 0.688
+ "mcnemar_vs_baseline_same_sig_top8": {
+  "query_captions_only": {
+   "b": 0,
+   "c": 1,
+   "p": 1.0
+  },
+  "corpus_captions_only": {
+   "b": 0,
+   "c": 0,
+   "p": 1.0
+  },
+  "both": {
+   "b": 0,
+   "c": 1,
+   "p": 1.0
+  }
+ },
+ "restore": "make reset-corpus",
+ "run_meta": {
+  "git_sha": "3b82fee534dba43ee48dea07d183e0a4024179a6",
+  "git_dirty": false,
+  "env": {
+   "LLM_MAX_CONCURRENCY": null,
+   "LLM_ACQUIRE_TIMEOUT_S": null,
+   "DEGRADE_DISABLED": null,
+   "FAULT_INJECT_THROTTLE": null,
+   "PROBE_PACING_S": null,
+   "EMBED_MODEL_NAME": "BAAI/bge-small-en-v1.5",
+   "BEDROCK_MODEL_ID": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+  },
+  "run_ordinal": 5,
+  "db": {
+   "chunks": 2487,
+   "chunks_md5": "d552a182a397",
+   "tickets": 401,
+   "tickets_md5": "cdfa249cde3c"
+  }
  }
 }

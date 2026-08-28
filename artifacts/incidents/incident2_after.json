@@ -1,50 +1,275 @@
 {
  "incident": 2,
  "tag": "after",
- "changed_pages_probed": 8,
- "stale_pages_in_db": 3,
- "queries_serving_stale_content": 3,
- "stale_serving_incidence": 0.375,
+ "staleness_definition": "chunked origin/main text differs from DB chunk text",
+ "upstream_pages": {
+  "modified": 38,
+  "of_modified_content_changed": 0,
+  "of_modified_chunk_identical": 38,
+  "of_modified_missing_from_db": 0,
+  "added_not_measurable": 11,
+  "deleted_not_measurable": 1,
+  "renamed_not_measurable": 1
+ },
+ "stale_pages": [],
+ "queries": 47,
+ "queries_serving_stale_docs": 0,
+ "stale_serving_incidence": 0.0,
  "rows": [
   {
-   "query": "Secrets",
-   "page": "content/en/docs/concepts/configuration/secret.md",
-   "stale_chunks_in_top5": 4
+   "ticket": 107372,
+   "stale_docs_in_top8": 0,
+   "keys": []
   },
   {
-   "query": "Custom Resources",
-   "page": "content/en/docs/concepts/extend-kubernetes/api-extension/custom-resources.md",
-   "stale_chunks_in_top5": 5
+   "ticket": 107405,
+   "stale_docs_in_top8": 0,
+   "keys": []
   },
   {
-   "query": "Pod Priority and Preemption",
-   "page": "content/en/docs/concepts/scheduling-eviction/pod-priority-preemption.md",
-   "stale_chunks_in_top5": 0
+   "ticket": 107886,
+   "stale_docs_in_top8": 0,
+   "keys": []
   },
   {
-   "query": "Topology-Aware Workload Scheduling",
-   "page": "content/en/docs/concepts/scheduling-eviction/topology-aware-scheduling.md",
-   "stale_chunks_in_top5": 0
+   "ticket": 107927,
+   "stale_docs_in_top8": 0,
+   "keys": []
   },
   {
-   "query": "Gateway API",
-   "page": "content/en/docs/concepts/services-networking/gateway.md",
-   "stale_chunks_in_top5": 0
+   "ticket": 108579,
+   "stale_docs_in_top8": 0,
+   "keys": []
   },
   {
-   "query": "Storage Classes",
-   "page": "content/en/docs/concepts/storage/storage-classes.md",
-   "stale_chunks_in_top5": 3
+   "ticket": 110357,
+   "stale_docs_in_top8": 0,
+   "keys": []
   },
   {
-   "query": "Volumes",
-   "page": "content/en/docs/concepts/storage/volumes.md",
-   "stale_chunks_in_top5": 0
+   "ticket": 111321,
+   "stale_docs_in_top8": 0,
+   "keys": []
   },
   {
-   "query": "Pods",
-   "page": "content/en/docs/concepts/workloads/pods/_index.md",
-   "stale_chunks_in_top5": 0
+   "ticket": 111933,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 112143,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 112171,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 113139,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 114115,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 114815,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 114996,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 115044,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 115294,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 115343,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 116710,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 116831,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 117745,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 118151,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 119767,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 120268,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 120937,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 121294,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 121794,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 121942,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 122057,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 123119,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 124749,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 125012,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 125354,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 125467,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 126468,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 126552,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 126885,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 126922,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 129825,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 129982,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 131045,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 131381,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 131661,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 132719,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 133474,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 135425,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 137797,
+   "stale_docs_in_top8": 0,
+   "keys": []
+  },
+  {
+   "ticket": 139028,
+   "stale_docs_in_top8": 0,
+   "keys": []
   }
- ]
+ ],
+ "run_meta": {
+  "git_sha": "3b82fee534dba43ee48dea07d183e0a4024179a6",
+  "git_dirty": false,
+  "env": {
+   "LLM_MAX_CONCURRENCY": null,
+   "LLM_ACQUIRE_TIMEOUT_S": null,
+   "DEGRADE_DISABLED": null,
+   "FAULT_INJECT_THROTTLE": null,
+   "PROBE_PACING_S": null,
+   "EMBED_MODEL_NAME": "BAAI/bge-small-en-v1.5",
+   "BEDROCK_MODEL_ID": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+  },
+  "run_ordinal": 2,
+  "db": {
+   "chunks": 2690,
+   "chunks_md5": "c5c21695b0c7",
+   "tickets": 401,
+   "tickets_md5": "0f062f37c56f"
+  }
+ }
 }
