@@ -164,8 +164,7 @@ def load_state(conn: psycopg.Connection, start_sha: str) -> str:
     until the process exited)."""
     with conn.cursor() as cur:
         cur.execute(
-            "INSERT INTO replay_state (id, current_sha) VALUES (1, %s)"
-            " ON CONFLICT (id) DO NOTHING",
+            "INSERT INTO replay_state (id, current_sha) VALUES (1, %s) ON CONFLICT (id) DO NOTHING",
             (start_sha,),
         )
         conn.commit()
