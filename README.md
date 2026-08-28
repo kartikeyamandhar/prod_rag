@@ -50,11 +50,11 @@ flowchart LR
 
 | Corpus | Source | Size | Pinned at | Role |
 |---|---|---|---|---|
-| Knowledge base | kubernetes/website `content/en/docs/concepts` | 176 pages, 2,497 chunks | commit `7c54667` (2026-06-30) | Retrieval + replayed forward through real upstream commits |
+| Knowledge base | kubernetes/website `content/en/docs/concepts` | 176 pages, 2,487 chunks | commit `7c54667` (2026-06-30) | Retrieval + replayed forward through real upstream commits |
 | Resolved tickets | kubernetes/kubernetes closed `kind/bug` issues in sig/network, sig/scheduling, sig/storage | 401 issues, 392 with linked closing PR | snapshot 2026-08-19 | 354 as retrieval corpus, 47 held out as replayed incoming tickets |
 | Tenancy | deterministic hash of issue number | 50 tenants, 3 to 15 tickets each | | Simulated customers; isolation enforced at retrieval |
 
-The docs pin is deliberately backdated: 13 real upstream commits exist between the pin and upstream HEAD, so knowledge-base staleness is replayable history, not simulation.
+The docs pin is deliberately backdated, so knowledge-base staleness is replayable history, not simulation: at the 2026-08-27 measurement snapshot, 143 real upstream commits touching the subtree existed between the pin and origin/main, and incident 2 replays all of them.
 
 Held-out tickets carry **NULL embeddings** in the database. Vector search structurally cannot return them; the `is_held_out` flag on the FTS path is defense in depth, not the only barrier.
 
@@ -67,20 +67,24 @@ flowchart TD
     T["Ticket in<br/>(title, body, tenant_id)"] --> TR["Triage<br/>Haiku 4.5, strict JSON<br/>component + severity + confidence"]
     TR --> R["Hybrid retrieval, 4 ranked lists"]
     R --> RV["docs vector (HNSW cosine)"]
-    R --> RF["docs FTS (websearch)"]
+    R --> RF["docs FTS (lexical OR:<br/>title terms + flags, backticks,<br/>CamelCase, dotted paths)"]
     R --> TV["tickets vector<br/>WHERE tenant_id = mine"]
     R --> TF["tickets FTS<br/>WHERE tenant_id = mine"]
     RV & RF & TV & TF --> RRF["Reciprocal Rank Fusion<br/>score = sum of 1/(60+rank)<br/>top 8, corpus-tagged"]
-    RRF --> D["Draft<br/>Haiku 4.5, strict JSON<br/>citations validated against<br/>the 8 retrieved keys"]
-    D --> G{"Confidence gate<br/>0.5 x triage + 0.5 x retrieval"}
+    RRF --> D["Draft<br/>Haiku 4.5, strict JSON<br/>citations validated against the 8 keys<br/>+ self-assessed context_sufficiency 1-5"]
+    D --> G{"Confidence gate<br/>0.4 x triage + 0.3 x retrieval<br/>+ 0.3 x sufficiency/5"}
     G -- "body too short" --> RI["request-info"]
-    G -- "no citations OR degraded" --> ES["escalate"]
+    G -- "draft degraded" --> ES["escalate"]
+    G -- "sufficiency <= 2" --> RI
+    G -- "no citations" --> ES
     G -- ">= 0.65" --> AA["auto-attach"]
     G -- "< 0.35" --> RI
     G -- "0.35 to 0.65" --> ES
 ```
 
-Worked example from a live run on the deployed box (ticket: "kube-proxy conntrack entries leak after LoadBalancer service deletion", tenant 41): triage matched 6 terms giving confidence 1.0; docs-vector rank 1 scored 1/61 = 0.0164; retrieval confidence 0.0164 / 0.0328 = 0.5; gate = 0.5 x 1.0 + 0.5 x 0.5 = **0.75, auto-attach**, 5 validated citations, retrieval in 75ms on the t4g.
+Retrieval confidence is computed, never assumed: 0.5 x multi-list agreement in the top 8 + 0.3 x (FTS contributed at all) + 0.2 x score margin. An earlier version collapsed to a constant 0.5 whenever FTS returned nothing, which was always; that defect and its fix are measured below.
+
+Worked example from a live run (held-out ticket [#137797](https://github.com/kubernetes/kubernetes/issues/137797), "CVE-2026-3864: CSI Driver for NFS path traversal", tenant 3): triage sig/storage at 0.98; retrieval confidence 0.81 (multi-list agreement + FTS + margin, computed); the draft self-assesses context_sufficiency **1**, because the concepts docs genuinely do not contain this CVE's remediation, and cites nothing. Gate: 0.4 x 0.98 + 0.3 x 0.81 + 0.3 x 0.2 = 0.695, but the sufficiency <= 2 hard rule fires first: **request-info**, with three concrete clarifying questions (deployed driver version, RBAC scope on PV creation, volumeHandle audit). Retrieval 73ms, full pipeline 5.4s. An earlier README version showed a "0.75 auto-attach with 5 validated citations" worked example here; the audit traced it to the degraded extractive path wearing the success path's clothes, and it is retracted (that failure is incident 8 material).
 
 The draft stage refuses to trust the model: any citation whose source key is not one of the 8 retrieved item keys fails validation, retries once, then degrades. Hallucinated sources are structurally excluded from the output.
 
@@ -107,6 +111,8 @@ flowchart LR
 | Foreign-tenant rows in top 8 | **0** (verified per-row against the DB) | **4** (tenants 14, 2, 45, 43) |
 | Decision point | logged at WARNING when disabled | same log line is the detection signal |
 
+Honesty note: with ~50 tenants sharing one corpus, a tenant-blind retriever is *expected* to return ~98% foreign rows (the null model predicts a 0.9801 foreign fraction; the filter-off arm observes 0.9786). The filter-off arm therefore demonstrates the isolation mechanism, it does not measure a detection capability, and the incident 5 row below is framed accordingly.
+
 ### Bedrock failure (incident 6's mechanism, verified by test against the real DB)
 
 ```mermaid
@@ -128,7 +134,7 @@ flowchart LR
 
 ### Knowledge-base drift (the engine for incidents 2 and 3)
 
-The replayer applies real upstream commits one at a time: re-chunk and re-embed only the changed pages, delete or rename with a ledger entry, one transaction per commit so readers never see a half-updated page. Five commits replayed locally in order:
+The replayer applies real upstream commits one at a time: re-chunk and re-embed only the changed pages, delete or rename with a ledger entry, one transaction per commit so readers never see a half-updated page. The "one transaction per commit" claim was initially FALSE: an implicit transaction opened by the state read swallowed every per-commit transaction into one giant one, so 143 live-applied commits were invisible to other connections until the process exited and a crash would have rolled back all of them (audit A11). The fix commits after the state read; mid-replay ledger visibility from a second connection is now verified live, and the full 143-commit replay ends with all 38 upstream-modified pages byte-identical to a fresh chunking of origin/main. Five commits replayed locally in order:
 
 | Commit | Page | Change | Chunks before | Chunks after |
 |---|---|---|---|---|
@@ -146,7 +152,7 @@ The replayer applies real upstream commits one at a time: re-chunk and re-embed 
 
 ```mermaid
 xychart-beta
-    title "Ticket storm: 10 requests in 1 second (stub pipeline, local)"
+    title "Ticket storm: 11 iterations arriving inside 1s (stub pipeline, local)"
     x-axis ["min", "median", "p90", "p95", "max"]
     y-axis "HTTP latency (ms)" 0 --> 60
     bar [27.6, 29.9, 34.9, 43.9, 52.9]
@@ -155,8 +161,8 @@ xychart-beta
 | Measurement | Value | Conditions |
 |---|---|---|
 | Storm: 11 requests / 1s | 0 failures, median 30ms, p95 44ms | k6, stub pipeline, local (latency only; stub quality numbers are never reported) |
-| Hybrid retrieval, warm | mean 8.7ms, p50 8.5ms over 20 calls | laptop, embed + 4 queries + fusion |
-| Retrieval on the deployed box | 75ms | t4g.medium, live ticket |
+| Hybrid retrieval, warm (post-FTS-rewrite) | mean 16.3ms, p50 15.9ms, p95 18.9ms over 20 calls | laptop, embed + 4 lists + fusion; the lexical OR query roughly doubles pre-rewrite cost (was mean 8.7ms) and buys the MRR gain above |
+| Retrieval on the deployed box | 73ms | t4g.medium, live held-out ticket, post-rewrite |
 | 8 concurrent retrievals | identical results, no errors | one connection per thread |
 
 ### Bedrock, metered (5 held-out tickets, full pipeline + judge)
@@ -169,51 +175,62 @@ xychart-beta
     bar [15099, 2553, 7008, 926]
 ```
 
-| Metric | Measured |
+| Metric | Measured (2026-08-27, post-audit rebuild) |
 |---|---|
-| Pipeline calls (triage + draft, incl. 2 validation retries) | 12 calls, 15,099 in / 2,553 out tokens |
-| Judge calls | 5 calls, 7,008 in / 926 out tokens |
-| **Total cost, 5 tickets end to end** | **$0.0395** at first-party list rates ($1/$5 per MTok; Bedrock partner pricing may differ) |
+| Pipeline calls (triage + draft) | 10 calls = exactly 2 x 5 tickets, **zero validation retries**; 25,214 in / 2,363 out tokens |
+| Judge calls | 5 calls, 9,597 in / 882 out tokens |
+| **Total cost, 5 tickets end to end** | **$0.051** at first-party list rates ($1/$5 per MTok; Bedrock partner pricing may differ) |
 | LLM triage vs real SIG labels | 5 of 5 correct (smoke-sized n; the full held-out run is the reportable number) |
+| 30-ticket spot-check fill | 90 calls, 0/30 degraded, $0.30; every call metered, ledger reconciles |
+
+An earlier version of this table reported $0.0395 with "2 validation retries" and a call ledger that did not reconcile (104 expected vs 100 recorded): the unmetered gap was botocore's hidden internal retries, which also sat inside the admission-control semaphore. Internal retries are now disabled (max_attempts=1) and the failure taxonomy is explicit, so every Bedrock attempt is one metered call.
 
 ### Retrieval findings already on the record
 
-- **FTS contributes zero results for long queries**: a 9-word ticket title ANDs into nothing under `websearch_to_tsquery`, while a 3-word query returns full lists. Fusion on realistic tickets is vector-driven today; any FTS rewrite must justify itself on replay metrics, not vibes.
-- **Gate calibration is the open weakness**: when FTS is empty, the retrieval-confidence term collapses to a constant 0.5, so routing is dominated by triage confidence. Quantifying the damage is exactly what the incident series is for.
+- **Found, then fixed: FTS contributed zero results for every real query.** `websearch_to_tsquery` ANDs a ticket-length query into nothing; measured on the 15-query replay set, both FTS lists were empty 15/15, which also made RRF fusion inert (identical scores, lexicographic tie-break, docs always first). The fix OR-ifies title terms plus a lexical payload mined from the body (backticked terms, `--flags`, CamelCase, dotted.paths, quoted errors), pre-registered gates, A/B on the same DB state ([artifacts/r2_fts_ab.json](artifacts/r2_fts_ab.json)): docs-FTS non-empty 0/15 -> 15/15, multi-list membership in the top 8 0% -> 70%, docs-always-first 15/15 -> 1/15, MRR of the first same-SIG ticket **0.383 -> 0.787**, same-SIG@8 13 -> 14, docs-domain@8 10 -> 12 of 15.
+- **Found, then fixed: the gate was blind.** Retrieval confidence was a constant 0.5 whenever FTS was empty (always), capping gate confidence at a ceiling that one audit could reproduce as an arithmetic identity across every artifact row, and drafts that openly declared their context insufficient were still auto-attached. The v2 gate computes retrieval confidence from list agreement, blends in the draft's own context_sufficiency, and hard-routes sufficiency <= 2 to request-info: on the 30-ticket spot-check rebuild, **zero** confident-but-uncited drafts were auto-attached (previously 15/15 auto-attaches carried a draft that said its own context was insufficient).
+- **A bge query-prefix A/B came back null**: prepending the bge query instruction moved every replay metric by 0.0000, below the pre-registered 0.02 adoption bar, so the flag was deleted rather than shipped ([artifacts/r2_fts_ab.json](artifacts/r2_fts_ab.json)).
 
 ---
 
 ## The seven incidents, measured
 
-Each incident ran on the deployed system with one v1 fix, before and after. Scripted injections (the incident 3 deletion, the incident 6 throttle) are labeled scripted in the ledger and configuration; everything else is real load, real upstream commits, or the corpus's own properties. Raw data: [artifacts/incidents/](artifacts/incidents/).
+Each incident runs with one v1 fix, before and after, against the naive baseline. Scripted injections are labeled scripted in the ledger and configuration; everything else is real load, real upstream commits, or the corpus's own properties. Every post-audit artifact embeds `run_meta` (git SHA, behavior env, DB fingerprint, run ordinal) and the set is machine-validated by [probes/check_artifacts.py](probes/check_artifacts.py). Raw data: [artifacts/incidents/](artifacts/incidents/).
+
+**Re-measured after the audit** (single SHA, content-hash staleness, hybrid retrieval path, honest denominators):
 
 | # | Incident | Before (failure) | After (v1 fix) |
 |---|---|---|---|
-| 1 | Ticket storm, LLM in request path | median **21.1s**, p95 30s, only 6 of 11 requests finished in 30s | admission control (cap 3, overflow degrades): median **365ms**, all 11 finish, 0 failures |
-| 2 | Stale KB after real upstream edits | **8 of 8** changed-page queries served stale content | replay the real commits: **0 of 8** |
-| 3 | Orphaned page (scripted deletion) | deleted ingress page still cited in top 5 | replayer delete, 27 chunks removed, ledger row; retrieval falls to live pages |
-| 4 | Reindex under load | naive one-transaction reload: p95 **4,780ms**, 0.6% hard failures | incremental replay tick: p95 **150ms**, 0 failures |
-| 5 | Tenant leakage (seeded filter bug) | **47 of 47** queries leak; 184 of 188 ticket results foreign | **0 of 47** with the filter restored |
-| 6 | Provider throttle (scripted injection) | no degrade path: **15 of 15 requests fail** with 5xx | 15 of 15 return cited retrieval-only drafts, all force-escalated, median 285ms |
-| 7 | Image-blind baseline vs captioning | text-only: same-SIG 87.5%, docs-domain 71.9% (n=32) | captioning (29 images, $0.04): **no improvement** (84.4% / 68.8%), an honest null result: near-ceiling metric, and long captions dilute short-title queries |
+| 2 | Stale KB after real upstream edits | **34 of 47** held-out queries served stale docs in their top 8 (72.3%); 37 of 38 upstream-modified pages truly content-changed (chunk-hash vs origin/main); 11 added + 1 deleted + 1 renamed page disclosed as unmeasurable by this metric | replay all 143 real commits: **0 of 47**, with all 38 modified pages verified chunk-identical to origin/main |
+| 3 | Orphaned page (scripted deletion) | deleted ingress page served on **2 of 3** customer-shaped queries (the third never surfaced it, disclosed) | replayer delete path, 27 chunks removed, ledger row; **0 of 3**; corpus restored by `make reset-corpus` |
+| 5 | Tenant leakage (seeded filter bug), reframed as a **mechanism demo** | filter off: 47/47 queries return foreign-tenant rows, foreign fraction 0.9786 -- which **matches the tenant-blind null model's 0.9801**, so this arm verifies a WHERE clause, not a detection capability (stated in the artifact itself) | filter on: **0 of 47**; a true detection metric would need adversarial cross-tenant content, which is fenced (synthetic tickets are banned as circular) |
+| 7 | Image-blind baseline vs captioning, four arms | baseline: same-SIG MRR@8 **0.728**, docs-domain MRR@8 0.218 (n=32, 30 with usable captions) | **null result confirmed under a valid design**: corpus-side captions alone +0.029 MRR; query-side captions alone *hurt* docs-domain MRR 0.218 -> 0.155 (caption text dilutes short queries); both-arms match query-only; every McNemar vs baseline p = 1.0; filter-off corpus arms measured and disclosed |
 
 ```mermaid
 xychart-beta
-    title "Incident 1: storm latency, before vs after admission control (ms)"
-    x-axis ["median before", "p95 before", "median after", "p95 after"]
-    y-axis "ms (log-ish scale, real values)" 0 --> 31000
-    bar [21056, 30085, 365, 13291]
+    title "Incident 2: held-out queries serving stale docs (of 47)"
+    x-axis ["before replay", "after 143-commit replay"]
+    y-axis "queries with stale docs in top 8" 0 --> 40
+    bar [34, 0]
 ```
 
 ```mermaid
 xychart-beta
-    title "Incident 4: p95 under sustained load during a reindex (ms)"
-    x-axis ["naive full reload", "incremental tick"]
-    y-axis "p95 ms" 0 --> 5000
-    bar [4780, 150]
+    title "Incident 7: same-SIG MRR@8 by arm (null result, now valid)"
+    x-axis ["baseline", "query captions", "corpus captions", "both"]
+    y-axis "MRR@8" 0 --> 1
+    bar [0.7284, 0.7269, 0.7571, 0.7477]
 ```
 
-The incident 7 null result is kept deliberately: the series is about measurement discipline, and "the obvious fix did not move the metric" is a finding, not a failure of the writeup.
+The incident 7 null result is kept deliberately: the series is about measurement discipline, and "the obvious fix did not move the metric" is a finding, not a failure of the writeup. The audited v1 version of this null was invalid four separate ways (near-ceiling metric, two variables moved at once, 13 of 32 tickets invisible to the URL extractor, captions evicting body text from the embed window); the redesign fixed all four and the null survived, which is the stronger claim.
+
+**Pending re-measurement on the box** (v1 numbers retracted, kept in [artifacts/incidents/retired_v1/](artifacts/incidents/retired_v1/)):
+
+| # | Incident | Why the v1 number is retracted | Redo design (pre-registered) |
+|---|---|---|---|
+| 1 | Ticket storm, LLM in request path | after-arm mixed 8 admission-degraded responses with 3 LLM responses under one "median 365ms"; before-arm p95 was the load tool's 30s cutoff, not a measurement; the deployed box never ran the measured admission config | outcome-class latencies (LLM vs degraded reported separately), gracefulStop 120s, per-arm degraded expectations asserted, env recorded in-artifact |
+| 4 | Reindex under load | window-ratio p95 presented as request p95; ~500x workload-size confound undisclosed; ran on the stub path unlabeled; the documented driver was not the one that ran | documented driver runs, stub label mandatory, headline = max read-block duration, workload sizes disclosed |
+| 6 | Provider throttle | "15 of 15 fail with 5xx" was really 10 5xx + 5 transport errors; before/after latencies measured different quantities under one name; p95 index math off at n=15 | 5xx vs transport split, time_to_error vs time_to_complete named honestly, correct percentiles, synthetic-injection flag in the artifact |
 
 ---
 
@@ -226,7 +243,18 @@ Two tiers, so evaluation cost stays sane:
 | Retrieval-tier (no LLM) | corpus counts, filter binding, latency, staleness/orphan probes | continuously, free |
 | LLM-tier | triage vs real labels, drafted responses judged against a **pinned rubric** ([probes/rubric.md](probes/rubric.md)), fix-hit vs real closing PRs | held-out slice + sampled schedules, metered |
 
-Hard rules: stub outputs never produce published quality numbers; **no judged number is published before a 30-ticket human spot-check of judge agreement** (deterministic sample: [artifacts/spot_check_sampling_sheet.csv](artifacts/spot_check_sampling_sheet.csv)). The judge already runs; its scores stay unpublished until that sheet is filled. Honesty is the product here.
+Hard rules: stub outputs never produce published quality numbers; **no judged number is published before a 30-ticket human spot-check of judge agreement** (deterministic sample: [artifacts/spot_check_sampling_sheet.csv](artifacts/spot_check_sampling_sheet.csv)). Agreement is reported as **Cohen's kappa on 3 collapsed bins (1-2 / 3 / 4-5) with a bootstrap CI** ([probes/judge_agreement.py](probes/judge_agreement.py)), never raw agreement (raw percent agreement overstates by 30-40 points on skewed score distributions); the acceptance bar is kappa > 0.6. The agreement population is restricted to non-degraded LLM drafts, and the fill aborts if more than 3 of 30 drafts degrade (an earlier sheet silently mixed 14 extractive fallbacks into the judged set). Judge inputs are the ticket, the draft, the exact context spans the drafter cited, and the real closing PR's title and body; an earlier judge received only a PR URL it could not open, and its floor-pinned scores were partly parse artifacts of a clamp that turned missing fields into 1s (the parser now raises instead).
+
+Disclosed limitation: the judge is the same model family as the drafter (Haiku 4.5 judging Haiku 4.5), a documented self-preference bias risk. Mitigations here are the pinned rubric, real-PR ground truth, strict parsing, and the human spot-check gate; a cross-family judge is the correct next step if judged numbers ever carry more weight than a teaching series needs.
+
+---
+
+## The audit
+
+Before any series post was published, the whole codebase and every measured claim went through an adversarial review (three independent audit passes plus external best-practice research). It found real validity defects: the drafting model had only ever seen 200-character snippets of retrieved chunks; the JSON extractor mis-parsed braces inside string literals (Kubernetes content is brace-dense) and caused half the "degraded" runs; FTS was empty on every real query; the judge's ground truth was a URL it could not open. Every number above reflects the post-audit rebuild, and the two juiciest defects are pre-registered as future incidents:
+
+- **Incident 8: the 200-character context bug.** Retrieval stored full chunks; the prompt renderer sliced 200 characters and asked for 140-character verbatim quotes from them. Refusals, retries, and degrades followed. Before/after on the same tickets is already measurable from the audit trail.
+- **Incident 9: the brace-blind JSON parser.** `text.find("{") ... rfind("}")` meets `{"selector": {matchLabels: ...}}` inside a quoted log line. The string-aware parser ships with regression tests that fail on the pre-fix code.
 
 ---
 
@@ -243,7 +271,7 @@ Hard rules: stub outputs never produce published quality numbers; **no judged nu
 | [probes/](probes/) | replay harness, judge + pinned rubric, metered smoke, spot-check sheet |
 | [load/](load/) | k6: storm, sustained, reindex-under-load |
 | [infra/](infra/) | Terraform (t4g.medium, SG allowlist, Bedrock instance role), deploy/stop/residual scripts |
-| [artifacts/](artifacts/) | committed measurements: k6 summaries, metered smoke JSON, corpus manifest counterparts |
+| [artifacts/](artifacts/) | committed measurements with embedded provenance (run_meta), incident JSONs, retired v1 numbers, spot-check sheet, caption + PR-content caches |
 
 ## Quickstart
 
